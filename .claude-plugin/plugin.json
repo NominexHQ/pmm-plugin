@@ -1,0 +1,29 @@
+{
+  "name": "pmm",
+  "version": "2.0.0",
+  "description": "Git-backed structured memory for Claude Code. 16 files track decisions, lessons, preferences, and relationships. Auto-loaded, auto-saved. Memory compounds across sessions.",
+  "author": {
+    "name": "NominexHQ"
+  },
+  "repository": "https://github.com/NominexHQ/poor-man-memory",
+  "homepage": "https://github.com/NominexHQ/poor-man-memory",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "session-memory",
+    "structured-memory",
+    "git-backed",
+    "decisions",
+    "lessons",
+    "knowledge-base",
+    "compounding",
+    "multi-agent",
+    "open-source",
+    "markdown",
+    "no-infrastructure",
+    "session-hooks",
+    "auto-save",
+    "agent-memory",
+    "workflow"
+  ]
+}

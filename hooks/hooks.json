@@ -1,0 +1,25 @@
+{
+  "description": "PMM hooks — auto-load memory at session start, track save cadence on stop",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/should-save.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
