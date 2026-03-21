@@ -1,7 +1,7 @@
 {
   "name": "pmm",
   "version": "2.0.0",
-  "description": "Git-backed structured memory for Claude Code. 16 files track decisions, lessons, preferences, and relationships. Auto-loaded, auto-saved. Memory compounds across sessions.",
+  "description": "Every session, Claude loads what it already knows — then adds to it. Structured flat files, git-backed, hook-driven. No database, no setup. Decisions, lessons, preferences. Memory that compounds across sessions.",
   "author": {
     "name": "NominexHQ"
   },
@@ -11,19 +11,18 @@
   "keywords": [
     "memory",
     "session-memory",
-    "structured-memory",
     "git-backed",
+    "compounding",
+    "structured-memory",
     "decisions",
     "lessons",
-    "knowledge-base",
-    "compounding",
+    "hooks",
+    "auto-save",
     "multi-agent",
     "open-source",
-    "markdown",
     "no-infrastructure",
-    "session-hooks",
-    "auto-save",
-    "agent-memory",
-    "workflow"
+    "knowledge-base",
+    "session-persistence",
+    "agent-memory"
   ]
 }
