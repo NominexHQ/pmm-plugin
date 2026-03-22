@@ -55,3 +55,21 @@ Context-first: answers from already-loaded Tier 1 files before dispatching agent
 `graph.md`, `vectors.md`, `taxonomies.md`, `assets.md` are not loaded at session start. Load them on demand when a request involves relationships, semantic clusters, categories, or asset references. Read only what's needed.
 
 If `memory/secrets.md` exists, credentials are available there. Do not echo or summarise its contents.
+
+## Load Strategies
+
+The `## Active Files` section of `config.md` supports an optional load strategy column:
+
+```
+- timeline.md: active | tail:5
+- decisions.md: active | tail:10
+- memory.md: active | full
+```
+
+Valid strategies:
+- `full` — load the entire file (default when omitted)
+- `tail:N` — load only the last N entries (useful for append-only sliding-window files)
+- `header` — load only the file header/frontmatter
+- `skip` — do not load this file at session start (activate for maintain only)
+
+Sliding-window files (`timeline.md`, `decisions.md`, `lessons.md`) benefit from `tail:N` to keep session-start context lean. Use `pmm:recall` to load full files on demand regardless of the session-start strategy.

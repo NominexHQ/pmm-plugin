@@ -1,6 +1,6 @@
 ---
 name: pmm:settings
-description: "Change Poor Man's Memory configuration. Re-presents preference prompts for save cadence, commit behaviour, push behaviour, sliding window size, verbosity, repository visibility, maintain agent model, maintain strategy, readonly agent model, session start mode, recall beyond window, secrets_git, pre-compact hook, and active files. Use when the user runs /pmm:settings or asks to change memory system settings."
+description: "Change Poor Man's Memory configuration. Re-presents preference prompts for save cadence, commit behaviour, push behaviour, sliding window size, verbosity, repository visibility, maintain agent model, maintain strategy, readonly agent model, session start mode, recall beyond window, secrets_git, pre-compact hook, active files, and load strategies. Use when the user runs /pmm:settings or asks to change memory system settings."
 argument-hint: ""
 ---
 
@@ -36,6 +36,7 @@ Read `memory/config.md` and display the current settings to the user as a summar
 > - Memory priority: [current]
 > - Active files: [count] of 15 active
 > - Deactivated: [list, or "none"]
+> - Load strategies: [list files with non-default strategies, or "all full"]
 
 ### Step 2 — Present preference prompts
 
@@ -128,6 +129,30 @@ Use `AskUserQuestion` to present the same questions from Phase 1 of the main ski
 - Coexist — both systems operate independently (pre-v1.8.0 behaviour)
 
 *Explain: Claude Code has its own auto-memory system (in .claude/projects/.../memory/). PMM-first means PMM is the source of truth — Claude auto-memory should not duplicate facts, decisions, or timeline events that PMM already tracks.*
+
+**Q17: Load strategies** — How much of each Tier 1 file should the SessionStart hook inject at session start?
+
+Read the current `## Active Files` section from `memory/config.md` and display each active Tier 1 file with its current strategy (or `full` if none set). For each file the user wants to change, accept a new strategy:
+- `full` (default) — load the entire file
+- `tail:N` — load only the last N lines/entries (recommended for `timeline.md`, `decisions.md`, `lessons.md`)
+- `header` — load only the file header
+- `skip` — exclude from session-start injection (file remains active for maintain; use `pmm:recall` to load on demand)
+
+Suggested defaults if starting fresh:
+- `timeline.md`: tail:5
+- `decisions.md`: tail:10
+- `lessons.md`: tail:5
+- All others: full (or omit the column)
+
+Format written to `config.md`:
+```
+- timeline.md: active | tail:5
+- decisions.md: active | tail:10
+```
+
+Missing `| strategy` = `full`. Tier 2 files (`graph.md`, `vectors.md`, `taxonomies.md`, `assets.md`) ignore load strategies — they are never loaded at session start.
+
+*Note: Load strategies only affect what the SessionStart hook injects. `pmm:recall` always loads the full file on demand regardless of the configured strategy.*
 
 ### Step 3 — Write updated config
 
