@@ -33,9 +33,7 @@ That's it. PMM handles the rest.
 
 ### `pmm:init`
 
-Without init, there's no structure. You'd have to manually create 16 files, figure out the heading format for each, wire hooks, set up git ignores for secrets — all before writing a single line of memory. Most people would give up or build something ad hoc that falls apart in a week.
-
-`pmm:init` runs a 9-question preference wizard, scaffolds the entire `memory/` directory with properly formatted files, and sets up git integration. First-run only — if `memory/` already exists, it tells you to use `pmm:settings`.
+Scaffolds the entire `memory/` directory via a 9-question preference wizard, creates properly formatted files, and sets up git integration. First-run only — if `memory/` already exists, it tells you to use `pmm:settings`.
 
 **Arguments**:
 
@@ -103,7 +101,7 @@ You know you decided something three weeks ago but can't find it. You remember t
 
 | Filter | Example | What it does |
 |--------|---------|--------------|
-| `by user:<name>` | `by user:raffi` | Attribution — find entries from a specific person |
+| `by user:<name>` | `by user:alex` | Attribution — find entries from a specific person |
 | `by agent:<name>` | `by agent:leith` | Attribution — find entries from a specific agent |
 | `since <date>` | `since 2026-03-15` | Date range start |
 | `before <date>` | `before 2026-03-20` | Date range end |
@@ -134,9 +132,9 @@ pmm:query auth changes since 2026-03-01 deep
 Same date-scoped query but expands through graph edges and vector clusters. Results include related concepts discovered via traversal, each tagged with provenance: `[via graph]`, `[via vectors]`, `[via taxonomy]`.
 
 ```
-pmm:query by user:raffi in decisions dump
+pmm:query by user:alex in decisions dump
 ```
-All of Raffi's decisions, returned as raw verbatim entries grouped by file. No prose synthesis — just the entries as written, with attribution and dates.
+All of Alex's decisions, returned as raw verbatim entries grouped by file. No prose synthesis — just the entries as written, with attribution and dates.
 
 ```
 pmm:query deployment
@@ -207,9 +205,7 @@ Nuclear option: re-hydrates every active file from scratch, regardless of curren
 
 ### `pmm:settings`
 
-Your needs change. You started with haiku but want sonnet for a complex codebase. You want to activate `graph.md` now that you have enough sessions for it to be useful. You want to switch from auto-commit to manual because you're working on a shared repo. Without `pmm:settings`, you'd be hand-editing `config.md` and hoping you got the format right.
-
-`pmm:settings` shows current configuration as a summary, then re-presents all 16 preference questions pre-filled with current values. Change what you want, skip what you don't.
+Shows current configuration as a summary, then re-presents all 16 preference questions pre-filled with current values. Change what you want, skip what you don't.
 
 **Arguments**: None.
 
@@ -242,9 +238,7 @@ pmm:settings
 
 ### `pmm:status`
 
-"Is memory actually saving?" You can't tell from the outside. Claude seems to have forgotten something — is it because the last save was hours ago? Because a file is still template-only? Because config drifted? You need the dashboard: what the system actually did, not what you assumed it did.
-
-`pmm:status` runs a diagnostic scan of your entire memory system and reports health metrics. Runs as a subagent to keep your main context clean.
+Runs a diagnostic scan of your entire memory system and reports health metrics. Runs as a subagent to keep your main context clean.
 
 **Arguments**: None.
 
@@ -305,9 +299,7 @@ pmm:viz graph
 
 ### `pmm:dump`
 
-Quick health check without leaving the terminal. You don't want to open a browser, you just want to see: which files are active, which are stale, what does the graph look like in text form?
-
-`pmm:dump` provides terminal-only memory visualization. No browser, no subagent overhead for simple modes. Runs as a subagent for detailed mode.
+Terminal-only memory visualization. No browser, no subagent overhead for simple modes. Runs as a subagent for detailed mode.
 
 **Arguments**:
 
@@ -335,9 +327,7 @@ pmm:dump summary
 
 ### `pmm:update`
 
-PMM evolves. New skills, new file types, better templates. You don't want to manually diff upstream changes against your installation, figure out what's new, and hand-apply patches — especially when the update adds a new memory file type that needs hydration or changes a hook script.
-
-`pmm:update` handles migration without losing your memory: system files get replaced, your data stays untouched. It checks upstream for a new PMM version, shows what changed, and applies updates to system files only. Never touches `memory/`.
+Checks upstream for a new PMM version, shows what changed, and applies updates to system files only. Never touches `memory/`. System files get replaced; your data stays untouched.
 
 **Arguments**: None.
 
@@ -376,7 +366,7 @@ When you activate a new file (`voices.md`, `graph.md`), run `pmm:hydrate <file>`
 Tier 1 files (12 core files) auto-load at session start. Tier 2 files (graph, vectors, taxonomies, assets) load on demand when a query needs them. This saves ~14k tokens per session. Don't switch to all-in-context unless you have a specific reason — the tiered system is designed for the way developers actually use memory.
 
 **Use query filters to find, not grep**
-`pmm:query` understands attribution (`by user:raffi`), dates (`since 2026-03-15`), file scope (`in decisions`), and deep traversal (`deep`). It's not just text search — it follows relationships through the graph and finds semantically related content through vector clusters. Use it instead of grepping memory files manually.
+`pmm:query` understands attribution (`by user:alex`), dates (`since 2026-03-15`), file scope (`in decisions`), and deep traversal (`deep`). It's not just text search — it follows relationships through the graph and finds semantically related content through vector clusters. Use it instead of grepping memory files manually.
 
 **Commit auto, push manual**
 The default (auto-commit, no auto-push) is intentional. Every save creates a git commit — that's your audit trail. But pushing is your choice. Keep memory local until you're ready to share it. If you want auto-push, `pmm:settings` lets you enable it.
