@@ -22,7 +22,8 @@ PMM fixes that: structured markdown files for the most recent context, git log f
 
 1. Install this plugin via the Claude Code plugin manager
 2. Run `pmm:init` — answers a few setup questions, creates `memory/` in your project
-3. Start working — memory saves automatically at milestones
+3. **Existing project?** Run `pmm:hydrate --all` — populates memory files from your current session context so you're not starting from empty templates
+4. Start working — memory saves automatically at milestones
 
 That's it. PMM handles the rest.
 
