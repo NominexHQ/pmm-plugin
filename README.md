@@ -106,8 +106,8 @@ You know you decided something three weeks ago but can't find it. You remember t
 
 | Filter | Example | What it does |
 |--------|---------|--------------|
-| `by user:<name>` | `by user:<name>` | Attribution — find entries from a specific person |
-| `by agent:<name>` | `by agent:<name>` | Attribution — find entries from a specific agent |
+| `by user:alex` | `by user:alex` | Attribution — find entries from a specific person |
+| `by agent:claude` | `by agent:claude` | Attribution — find entries from a specific agent |
 | `since <date>` | `since 2026-03-15` | Date range start |
 | `before <date>` | `before 2026-03-20` | Date range end |
 | `in <file>` | `in decisions` | Scope search to one memory file |
@@ -137,7 +137,7 @@ pmm:query auth changes since 2026-03-01 deep
 Same date-scoped query but expands through graph edges and vector clusters. Results include related concepts discovered via traversal, each tagged with provenance: `[via graph]`, `[via vectors]`, `[via taxonomy]`.
 
 ```
-pmm:query by user:<name> in decisions dump
+pmm:query by user:alex in decisions dump
 ```
 All of Alex's decisions, returned as raw verbatim entries grouped by file. No prose synthesis — just the entries as written, with attribution and dates.
 
@@ -415,7 +415,7 @@ Tier 1 files (12 core files) auto-load at session start. Tier 2 files (graph, ve
 `pmm:recall auth` gives you a working briefing — decisions, lessons, state, next steps — synthesized and ready to act on. `pmm:query auth` gives you search results — filterable, attributed, with optional deep traversal. Recall is for "catch me up." Query is for "find me that specific thing." Use both, but start with recall when switching workstreams.
 
 **Use query filters to find, not grep**
-`pmm:query` understands attribution (`by user:<name>`), dates (`since 2026-03-15`), file scope (`in decisions`), and deep traversal (`deep`). It's not just text search — it follows relationships through the graph and finds semantically related content through vector clusters. Use it instead of grepping memory files manually.
+`pmm:query` understands attribution (`by user:alex`), dates (`since 2026-03-15`), file scope (`in decisions`), and deep traversal (`deep`). It's not just text search — it follows relationships through the graph and finds semantically related content through vector clusters. Use it instead of grepping memory files manually.
 
 **Commit auto, push manual**
 The default (auto-commit, no auto-push) is intentional. Every save creates a git commit — that's your audit trail. But pushing is your choice. Keep memory local until you're ready to share it. If you want auto-push, `pmm:settings` lets you enable it.
