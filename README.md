@@ -149,7 +149,7 @@ pmm:query deployment
 Broad search across all files. Returns a narrative synthesis covering deployment-related decisions, processes, timeline events, and lessons. Casts a wide net when you're not sure which file has what you need.
 
 **Behaviour notes**:
-- Context-first: if `bootstrap_wired` is set, answers from loaded Tier 1 files without dispatching an agent. Tier 2 files load on demand via the Read tool. Agent dispatch only in eager mode or when bootstrap isn't wired.
+- Context-first: answers from Tier 1 files loaded by the SessionStart hook without dispatching an agent. Tier 2 files load on demand via the Read tool. Agent dispatch only in eager mode or when hook-based loading is unavailable.
 - Beyond-window fallback: if no results found in current files, checks config for `recall_beyond_window` mode (`prompt` or `auto`) before searching git history.
 
 ---
@@ -190,7 +190,7 @@ Everything PMM knows about the migration — synthesized into working context, n
 - **After `/compact`**: Context window just got compressed. `pmm:recall [topic]` rebuilds your working context for whatever you were focused on.
 
 **Behaviour notes**:
-- Context-first: if `bootstrap_wired` is set, reads from loaded Tier 1 files without dispatching an agent. Tier 2 files loaded on demand only when the topic involves relationships, entities, or classifications. Agent dispatch only in eager mode or when bootstrap isn't wired.
+- Context-first: reads from Tier 1 files loaded by the SessionStart hook without dispatching an agent. Tier 2 files loaded on demand only when the topic involves relationships, entities, or classifications. Agent dispatch only in eager mode or when hook-based loading is unavailable.
 - Differentiation from `pmm:query`: query is search (find specific things, filters, attribution, dump mode). recall is briefing (synthesize working context, actionable output). query answers "what did we decide about X?" — recall answers "catch me up on X so I can start working."
 
 ---
@@ -400,6 +400,36 @@ pmm:update
 
 ---
 
+### `pmm:init-local-skills`
+
+Cowork has no private marketplace support — you can't install plugins the normal way. If you're using PMM in a Cowork project, skills aren't available unless they exist as local skill files in `.claude/skills/`. Manually copying and maintaining those files is error-prone and drifts from the plugin source.
+
+`pmm:init-local-skills` symlinks pre-built local skill variants from the plugin into `.claude/skills/` so PMM skills work in Cowork without manual file management.
+
+**Arguments**:
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `--force` | No | — | Overwrite existing standalone copies and fix wrong-target symlinks. Correct symlinks are always skipped regardless |
+
+**Use cases**:
+- **Cowork project**: Run once after installing PMM to make all skills available in Cowork's local skill system
+- **After `pmm:update`**: Re-run to pick up any new or changed local skill variants shipped with the update
+- **Fixing broken symlinks**: `--force` replaces standalone copies or wrong-target symlinks with correct ones
+
+**Example**:
+```
+pmm:init-local-skills
+```
+
+**Behaviour notes**:
+- Idempotent. Running twice with no changes produces all skips — safe to re-run at any time.
+- Uses relative symlinks so the project remains portable.
+- Never modifies plugin source files — the `local/` directory inside the plugin is read-only.
+- `--force` only affects standalone copies and wrong-target symlinks. Correct symlinks are never touched.
+
+---
+
 ## Patterns and anti-patterns
 
 ### Patterns (do this)
@@ -452,7 +482,7 @@ Memory files track what happened, not what should happen. `decisions.md` records
 
 ## How hooks work
 
-Installing PMM wires three hooks into your project:
+Installing PMM wires two hooks into your project (plus a soft instruction):
 
 - **SessionStart** (`session-start.sh`): Runs when Claude Code opens your project. Reads `config.md`, injects active Tier 1 files into context, loads `session-instructions.md`. No manual `@-import` editing needed.
 - **Stop** (`should-save.sh`): Monitors save cadence based on your `config.md` settings. Zero token cost — pure bash counter. When the threshold is reached, blocks exit until a save completes.
@@ -466,7 +496,7 @@ Not all save triggers are equal. Some are deterministic; others depend on Claude
 
 - **Stop hook** (`should-save.sh`): A bash counter tracks conversation turns against the cadence set in `config.md`. When the threshold is reached, the hook blocks Claude Code from exiting until `pmm:save` completes. Zero token cost — pure bash, no agent dispatch for the counting. The counter increments on every turn; the save fires when the count hits the configured threshold. This is deterministic: if the counter fires, the save happens. No exceptions.
 
-- **SessionStart hook** (`session-start.sh`): Loads Tier 1 memory files into context when Claude Code opens your project. Reads `config.md` to determine which files are active, cats all non-empty Tier 1 files with headers, and injects `session-instructions.md`. Non-blocking — stdout is injected into Claude's context window. This is what gives Claude your memory at session start without manual `@-import` wiring in CLAUDE.md.
+- **SessionStart hook** (`session-start.sh`): Loads Tier 1 memory files into context when Claude Code opens your project. Reads `config.md` to determine which files are active and applies per-file load strategies from the Active Files section: `full` (entire file), `tail:N` (last N entries), `header` (content before second `##` heading), or `skip` (don't load). Injects `session-instructions.md` alongside loaded files. Non-blocking — stdout is injected into Claude's context window. This is what gives Claude your memory at session start without manual `@-import` wiring in CLAUDE.md.
 
 **Soft triggers** — guidance Claude follows but cannot enforce:
 
@@ -484,7 +514,7 @@ The distinction matters: hard triggers catch what soft triggers might miss, and 
 
 ### Tier 1 — always loaded
 
-Injected into context by the SessionStart hook at every session start. These are the 12 core files that give Claude your project's memory without manual wiring.
+Injected into context by the SessionStart hook at every session start. These are the 12 core files that give Claude your project's memory without manual wiring. Each file's load strategy is configurable via `config.md` (`full`, `tail:N`, `header`, or `skip`) — not all-or-nothing loading.
 
 | File | What it stores | Update rule | Trigger |
 |------|---------------|-------------|---------|
