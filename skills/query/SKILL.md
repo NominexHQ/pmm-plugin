@@ -43,7 +43,7 @@ Map question type to target file(s):
 Extract from `$ARGUMENTS`:
 
 - **Keyword / question** — everything that is not a filter or modifier
-- **Attribution filter** — `by namespace:name` (e.g. `by user:raffi`, `by agent:leith`)
+- **Attribution filter** — `by namespace:name` (e.g. `by user:alex`, `by agent:leith`)
 - **Date filter** — `since YYYY-MM-DD` or `before YYYY-MM-DD`
 - **File scope** — `in <filename>` (e.g. `in decisions`, `in lessons`) — search only that file
 - **Deep flag** — presence of the word `deep` → set deep=true, remove from keyword
@@ -137,7 +137,7 @@ Rules:
 - Write in concise, direct prose — answer the question, don't describe what files say
 - Weave evidence from multiple source files into a coherent response
 - Cite sources inline as parentheticals: `(decisions.md)`, `(timeline.md, 2026-03-17)`
-- Preserve attribution tags inline where relevant: `[user:raffi]`
+- Preserve attribution tags inline where relevant: `[user:alex]`
 - For deep-mode results, note provenance naturally: "A related concept, X (via graph), also shows..."
 - For git history results: "(from git history, commit abc1234)"
 - End with a single `Sources:` footer line listing all files that contributed
