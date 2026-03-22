@@ -43,7 +43,7 @@ Map question type to target file(s):
 Extract from `$ARGUMENTS`:
 
 - **Keyword / question** — everything that is not a filter or modifier
-- **Attribution filter** — `by namespace:name` (e.g. `by user:name`, `by agent:name`)
+- **Attribution filter** — `by namespace:name` (e.g. `by user:<name>`, `by agent:<name>`)
 - **Date filter** — `since YYYY-MM-DD` or `before YYYY-MM-DD`
 - **File scope** — `in <filename>` (e.g. `in decisions`, `in lessons`) — search only that file
 - **Deep flag** — presence of the word `deep` → set deep=true, remove from keyword
