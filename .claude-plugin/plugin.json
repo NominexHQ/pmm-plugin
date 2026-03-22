@@ -1,7 +1,7 @@
 {
   "name": "pmm",
-  "version": "2.2.0",
-  "description": "By Monday, you're re-explaining choices you made on Thursday. PMM fixes that. Every session, Claude loads what it already knows, then adds to it. Structured markdown files, git-backed. No database, no setup. Decisions tracked with rationale, not just what but why. git log is your memory audit trail. Memory that compounds, not rots.",
+  "version": "2.3.0",
+  "description": "If you have ever had AI hallucinate and make things up (and gaslight you, even): it's because summaries do not preserve nuance. Each /compact cycle summarises and compresses. Decisions lose their rationale. Lessons lose their context. By Monday, you're re-explaining choices you made on Thursday. That's context rot. PMM fixes that. Every session, Claude loads what it already knows, then adds to it. Markdown files, git-backed. No database, no setup. Decisions tracked with rationale — not just what, but why. git log is your memory audit trail. Memory that compounds, not rots.",
   "author": {
     "name": "NominexHQ"
   },
