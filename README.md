@@ -1,17 +1,19 @@
 # Poor Man's Memory
 
-Structured, git-backed agent memory for Claude Code.
+Structured, git-backed memory for Claude Code. Memory that compounds, not rots.
 
-PMM gives Claude Code a persistent, compounding memory system: 16 specialized markdown files organized in tiers, auto-loaded at session start via hooks, auto-saved at threshold or on request.
+Without PMM, every new Claude Code session starts cold. Decisions get re-explained. Context rebuilds from scratch. The Monday morning problem: nothing from last week survived the weekend. This is context rot — and native auto-memory doesn't solve it. Flat summaries don't track decisions with history, don't tell you why a choice was made, don't give you an audit trail.
+
+PMM does.
 
 ---
 
 ## What it does
 
-- **Structured memory**: 16 files with distinct jobs — decisions, lessons, preferences, timeline, graph, vectors, and more. Each file stays focused; nothing bleeds between them.
+- **Structured memory**: 16 files with distinct jobs — decisions, lessons, preferences, timeline, graph, vectors, and more. Each file stays focused; nothing bleeds.
 - **Auto-loads at session start**: The `SessionStart` hook injects Tier 1 files (the 12 essential files) directly into context. Tier 2 files (graph, vectors, taxonomies, assets) load on demand.
-- **Auto-saves**: The `Stop` hook tracks save cadence. When the threshold fires, `pmm:save` runs. You can also save manually at any milestone.
-- **Git-backed**: Every save commits to git. Full audit trail. Memory compounds — earlier sessions inform later ones.
+- **Auto-saves**: The `Stop` hook monitors save cadence. When the threshold is reached, it blocks exit until `pmm:save` runs. Save manually at any milestone.
+- **Decision history**: Every decision is committed to git with context. `git log` is your memory audit trail — you can trace any choice back to when it was made and why.
 - **Configurable**: model selection (haiku by default), sliding window size, verbosity, repository visibility, PII handling.
 
 ---
@@ -47,7 +49,7 @@ That's it. PMM handles the rest.
 Installing PMM wires three hooks into your project:
 
 - **SessionStart** (`session-start.sh`): Runs when Claude Code opens your project. Reads `config.md`, injects active Tier 1 files into context, loads `session-instructions.md`. No manual `@-import` editing needed.
-- **Stop** (`should-save.sh`): Tracks save cadence based on your `config.md` settings. Zero token cost — pure bash counter. Fires `pmm:save` when threshold is reached.
+- **Stop** (`should-save.sh`): Monitors save cadence based on your `config.md` settings. Zero token cost — pure bash counter. When the threshold is reached, blocks exit until a save completes.
 - **SessionEnd** (soft instruction in `session-instructions.md`): Prompts Claude to save before closing. Best-effort — not a blocking hook.
 
 ---
