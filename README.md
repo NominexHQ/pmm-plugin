@@ -36,6 +36,8 @@ That's it. PMM handles the rest.
 
 ## Skills
 
+*Examples below use `alex` and `claude` as placeholder names — substitute your own.
+
 ### `pmm:init`
 
 Scaffolds the entire `memory/` directory via a 9-question preference wizard, creates properly formatted files, and sets up git integration. First-run only — if `memory/` already exists, it tells you to use `pmm:settings`.
