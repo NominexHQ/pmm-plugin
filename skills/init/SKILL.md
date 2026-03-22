@@ -185,7 +185,27 @@ Run `pmm:settings` at any time to change these.
 
 ## Active Files
 
-<for each file in Q7 active list: "- <file>: active">
+<!-- Which memory files are active. Deactivated files are not created or loaded. -->
+<!-- config.md and BOOTSTRAP.md are always active. -->
+<!-- Load Strategy column is optional. Missing = defaults to full. -->
+<!-- Valid strategies: full | tail:N | header | skip -->
+<!-- Tier 2 files (graph, vectors, taxonomies, assets) are not loaded at session start regardless of strategy. -->
+<for each active file, apply default load strategy:>
+- memory.md: active | full
+- assets.md: active
+- decisions.md: active | tail:10
+- processes.md: active | full
+- preferences.md: active | full
+- voices.md: active | full
+- lessons.md: active | tail:5
+- timeline.md: active | tail:5
+- summaries.md: active | full
+- progress.md: active | full
+- last.md: active | full
+- graph.md: active
+- vectors.md: active
+- taxonomies.md: active
+- standinginstructions.md: active | full
 <for each file NOT in Q7 active list: "- <file>: inactive">
 
 ## Protected Files

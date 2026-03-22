@@ -132,7 +132,7 @@ git add memory/ && git reset HEAD memory/secrets.md 2>/dev/null; git commit -m "
 | `## Recall Beyond Window` | `Mode:` | `prompt` | Whether to search git history for trimmed entries: `prompt` (ask first), `auto` (silent search) |
 | `## Context Tiers` | `Mode:` | `tiered` | Loading mode: `tiered` (Tier 1 injected by SessionStart hook, Tier 2 on demand) or `all-in-context` |
 | `## Memory Priority` | `Mode:` | `pmm-first` | How PMM interacts with Claude auto-memory: `pmm-first`, `deduplicate`, `coexist` |
-| `## Active Files` | `<file>: active/inactive` | all active | Which memory files are created and maintained |
+| `## Active Files` | `<file>: active [| strategy]` | all active, full | Which memory files are created and maintained. Optional load strategy: `full` (default), `tail:N` (last N entries), `header` (first section only), `skip` (omit from session start). Tier 2 files (graph, vectors, taxonomies, assets) are not loaded at session start regardless of strategy. |
 | `## Protected Files` | `secrets.md: protected` | always | Marks `secrets.md` as gitignored/never-touch |
 
 Skills must not modify `config.md` except for `pmm:settings` (which is the dedicated config management skill).
