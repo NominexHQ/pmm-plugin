@@ -2,9 +2,9 @@
 
 Structured, git-backed memory for Claude Code. Memory that compounds, not rots.
 
-Without PMM, every new Claude Code session starts cold. Decisions get re-explained. Context rebuilds from scratch. The Monday morning problem: nothing from last week survived the weekend. This is context rot — and native auto-memory doesn't solve it. Flat summaries don't track decisions with history, don't tell you why a choice was made, don't give you an audit trail.
+Claude Code's recall is shallow. Native auto-memory writes flat summaries. Each `/compact` cycle compresses further. Decisions lose their rationale. Lessons lose their context. By Monday, you're re-explaining choices you made on Thursday. That's context rot. Not forgetting, but fading.
 
-PMM does.
+PMM fixes that: structured markdown files for the most recent context, git log for everything else.
 
 ---
 
