@@ -1,7 +1,7 @@
 {
   "name": "pmm",
-  "version": "2.0.0",
-  "description": "Every session, Claude loads what it already knows — then adds to it. Structured flat files, git-backed, hook-driven. No database, no setup. Decisions, lessons, preferences. Memory that compounds across sessions.",
+  "version": "2.1.0",
+  "description": "Every session, Claude loads what it already knows — then adds to it. Structured flat files, git-backed, hook-driven. No database, no setup. Decisions tracked with history. git log is your memory audit trail. Memory that compounds, not rots.",
   "author": {
     "name": "NominexHQ"
   },
@@ -23,6 +23,9 @@
     "no-infrastructure",
     "knowledge-base",
     "session-persistence",
-    "agent-memory"
+    "agent-memory",
+    "traceability",
+    "audit-trail",
+    "context-management"
   ]
 }
