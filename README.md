@@ -32,9 +32,9 @@ That's it. PMM handles the rest.
 
 ### `pmm:init`
 
-**The pain**: Without init, there's no structure. You'd have to manually create 16 files, figure out the heading format for each, wire hooks, set up git ignores for secrets — all before writing a single line of memory. Most people would give up or build something ad hoc that falls apart in a week.
+Without init, there's no structure. You'd have to manually create 16 files, figure out the heading format for each, wire hooks, set up git ignores for secrets — all before writing a single line of memory. Most people would give up or build something ad hoc that falls apart in a week.
 
-**What it does**: Runs a 9-question preference wizard, scaffolds the entire `memory/` directory with properly formatted files, and sets up git integration. First-run only — if `memory/` already exists, it tells you to use `pmm:settings`.
+`pmm:init` runs a 9-question preference wizard, scaffolds the entire `memory/` directory with properly formatted files, and sets up git integration. First-run only — if `memory/` already exists, it tells you to use `pmm:settings`.
 
 **Arguments**:
 
@@ -58,9 +58,9 @@ The wizard asks about save cadence, commit behaviour, window sizes, verbosity, w
 
 ### `pmm:save`
 
-**The pain**: Without explicit saves, memory is whatever auto-memory decided to keep — flat, lossy, no structure. You made a critical architecture decision at 2pm. By 4pm, auto-memory has compressed it into "discussed architecture." The rationale? Gone. The alternatives you rejected? Gone. `pmm:save` captures decisions with rationale, lessons with context, timeline with attribution.
+Without explicit saves, memory is whatever auto-memory decided to keep — flat, lossy, no structure. You made a critical architecture decision at 2pm. By 4pm, auto-memory has compressed it into "discussed architecture." The rationale? Gone. The alternatives you rejected? Gone.
 
-**What it does**: Synthesizes what changed this session, dispatches a maintain agent (haiku by default) to update the relevant memory files, and commits to git.
+`pmm:save` synthesizes what changed this session, dispatches a maintain agent (haiku by default) to update the relevant memory files, and commits to git.
 
 **Arguments**:
 
@@ -88,9 +88,9 @@ pmm:save shipped the auth refactor, decided JWT over session tokens
 
 ### `pmm:query`
 
-**The pain**: You know you decided something three weeks ago but can't find it. You remember the conversation but not the file. Native memory doesn't have search — you either remember or you don't. `pmm:query` gives you filtered, attributed recall with provenance. You can trace not just what was decided, but who said it, when, and how the system found it.
+You know you decided something three weeks ago but can't find it. You remember the conversation but not the file. Native memory doesn't have search — you either remember or you don't. `pmm:query` gives you filtered, attributed recall with provenance. You can trace not just what was decided, but who said it, when, and how the system found it.
 
-**What it does**: Searches memory files with filtering, attribution, and optional deep traversal through graph relationships and vector clusters. Context-first — answers from loaded Tier 1 files without dispatching an agent when possible.
+`pmm:query` searches memory files with filtering, attribution, and optional deep traversal through graph relationships and vector clusters. Context-first — answers from loaded Tier 1 files without dispatching an agent when possible.
 
 **Arguments**:
 
@@ -115,11 +115,32 @@ pmm:save shipped the auth refactor, decided JWT over session tokens
 | `deep` | Expands search via vectors, graph, and taxonomy. Tags results with provenance: `[via vectors]`, `[via graph]`, `[via taxonomy]` |
 | `dump` | Returns structured verbatim entries grouped by file instead of prose narrative |
 
-**Use cases**:
-- `pmm:query why did we choose sqlite?` — find the decision and its rationale
-- `pmm:query auth changes since 2026-03-01 deep` — find everything auth-related with graph traversal
-- `pmm:query by user:raffi in decisions` — what did Raffi decide?
-- `pmm:query deployment process dump` — get raw entries, not a narrative
+**Examples**:
+
+```
+pmm:query why did we choose postgres?
+```
+Prose narrative answer with inline citations from `decisions.md`. Returns the decision, the alternatives considered, and the rationale — all attributed to when and by whom.
+
+```
+pmm:query auth changes since 2026-03-01
+```
+Scoped to entries from March 1st onward. Returns a prose narrative covering auth-related decisions, timeline events, and lessons within the date range.
+
+```
+pmm:query auth changes since 2026-03-01 deep
+```
+Same date-scoped query but expands through graph edges and vector clusters. Results include related concepts discovered via traversal, each tagged with provenance: `[via graph]`, `[via vectors]`, `[via taxonomy]`.
+
+```
+pmm:query by user:raffi in decisions dump
+```
+All of Raffi's decisions, returned as raw verbatim entries grouped by file. No prose synthesis — just the entries as written, with attribution and dates.
+
+```
+pmm:query deployment
+```
+Broad search across all files. Returns a narrative synthesis covering deployment-related decisions, processes, timeline events, and lessons. Casts a wide net when you're not sure which file has what you need.
 
 **Behaviour notes**:
 - Context-first: if `bootstrap_wired` is set, answers from loaded Tier 1 files without dispatching an agent. Tier 2 files load on demand via the Read tool. Agent dispatch only in eager mode or when bootstrap isn't wired.
@@ -129,9 +150,9 @@ pmm:save shipped the auth refactor, decided JWT over session tokens
 
 ### `pmm:hydrate`
 
-**The pain**: You activate a new file type — say `voices.md` — but it starts empty. The maintain agent will keep it shallow because it has nothing to build on. Each `pmm:save` adds a thin entry to an empty file, and that thin entry becomes the foundation for the next thin entry. The file never catches up. Hydrate breaks the cycle: it reads everything the system already knows and synthesizes a rich starting point.
+You just installed the PMM plugin on a project that already has weeks of session history. All 16 memory files are empty templates, but Claude has context from past sessions — decisions made, preferences expressed, lessons learned, all sitting in conversation history or CLAUDE.md notes. Without hydration, those empty files stay empty. The maintain agent has nothing to build on, so each `pmm:save` writes a thin entry to an empty file, and that thin entry becomes the foundation for the next thin entry. The files never catch up.
 
-**What it does**: Populates empty or thin memory files by reading all existing populated memory and synthesizing content for the target files. Cold start prevention.
+`pmm:hydrate` breaks the cycle: it reads everything the system already knows — populated memory files, existing CLAUDE.md notes, session context — and synthesizes rich starting content for target files.
 
 **Arguments**:
 
@@ -143,16 +164,39 @@ pmm:save shipped the auth refactor, decided JWT over session tokens
 
 Combinations: `--all --force` re-hydrates everything.
 
-**Use cases**:
-- After activating `graph.md` via `pmm:settings`: `pmm:hydrate graph.md`
-- After `pmm:init` on an existing project with session history: `pmm:hydrate --all`
-- When a file feels thin after many sessions: `pmm:hydrate preferences.md --force`
-- Quick audit of file status: `pmm:hydrate` with no args shows which files are populated vs template-only
+**Examples**:
 
-**Example**:
+```
+pmm:hydrate
+```
+No args: shows usage hint and lists every active memory file with its current status — populated, template-only, or empty. Use this to see what needs hydration before committing to a batch operation.
+
+```
+pmm:hydrate --all
+```
+Finds all template-only files and hydrates each from existing populated files and session context. This is the primary use case when installing PMM on an existing project — your first command after `pmm:init` if you already have history.
+
 ```
 pmm:hydrate voices.md
 ```
+Hydrates one specific file. Reads all populated memory files to build context, then synthesizes content for `voices.md`. Refuses if the file already has content — use `--force` to override.
+
+```
+pmm:hydrate preferences.md --force
+```
+Re-hydrates even though the file has content. Useful when a file feels thin or stale after many sessions — `--force` replaces existing content with a fresh synthesis from everything the system currently knows.
+
+```
+pmm:hydrate --all --force
+```
+Nuclear option: re-hydrates every active file from scratch, regardless of current content. Use sparingly — this discards all existing file content and replaces it with fresh synthesis. Useful after a major project pivot or when memory has drifted significantly from reality.
+
+**Use cases**:
+- **Just installed PMM on an existing project**: Run `pmm:init` then `pmm:hydrate --all` to bootstrap every file from your existing session history, CLAUDE.md notes, and conversation context
+- **Mid-project with CLAUDE.md notes and past decisions**: PMM picks up context from what's already in your project — previous decisions in chat history, preferences Claude has observed, processes you've established. Hydrate captures all of it into structured files
+- **Activated a new file type** via `pmm:settings`: `pmm:hydrate graph.md` gives it a running start instead of growing from nothing
+- **File feels thin or stale**: `pmm:hydrate preferences.md --force` rebuilds from current knowledge
+- **Quick audit**: `pmm:hydrate` with no args shows which files need attention
 
 **Behaviour notes**:
 - Template-only detection: strips blank lines, comments, and headings. If fewer than 3 content lines remain, the file is considered template-only.
@@ -162,9 +206,9 @@ pmm:hydrate voices.md
 
 ### `pmm:settings`
 
-**The pain**: Your needs change. You started with haiku but want sonnet for a complex codebase. You want to activate `graph.md` now that you have enough sessions for it to be useful. You want to switch from auto-commit to manual because you're working on a shared repo. Without `pmm:settings`, you'd be hand-editing `config.md` and hoping you got the format right.
+Your needs change. You started with haiku but want sonnet for a complex codebase. You want to activate `graph.md` now that you have enough sessions for it to be useful. You want to switch from auto-commit to manual because you're working on a shared repo. Without `pmm:settings`, you'd be hand-editing `config.md` and hoping you got the format right.
 
-**What it does**: Shows current configuration as a summary, then re-presents all 16 preference questions pre-filled with current values. Change what you want, skip what you don't.
+`pmm:settings` shows current configuration as a summary, then re-presents all 16 preference questions pre-filled with current values. Change what you want, skip what you don't.
 
 **Arguments**: None.
 
@@ -197,9 +241,9 @@ pmm:settings
 
 ### `pmm:status`
 
-**The pain**: "Is memory actually saving?" You can't tell from the outside. Claude seems to have forgotten something — is it because the last save was hours ago? Because a file is still template-only? Because config drifted? Status gives you the dashboard: what the system actually did, not what you assumed it did.
+"Is memory actually saving?" You can't tell from the outside. Claude seems to have forgotten something — is it because the last save was hours ago? Because a file is still template-only? Because config drifted? You need the dashboard: what the system actually did, not what you assumed it did.
 
-**What it does**: Runs a diagnostic scan of your entire memory system and reports health metrics. Runs as a subagent to keep your main context clean.
+`pmm:status` runs a diagnostic scan of your entire memory system and reports health metrics. Runs as a subagent to keep your main context clean.
 
 **Arguments**: None.
 
@@ -226,9 +270,9 @@ pmm:status
 
 ### `pmm:viz`
 
-**The pain**: Memory files are text. You can't see the shape of what you know. Which concepts cluster together? How have relationships evolved over 20 sessions? Where are the dense knowledge areas vs the gaps? Viz turns the graph into something you can explore visually — interactive, scrubbable through time, in your browser.
+Memory files are text. You can't see the shape of what you know. Which concepts cluster together? How have relationships evolved over 20 sessions? Where are the dense knowledge areas vs the gaps?
 
-**What it does**: Generates an interactive D3.js force-directed graph visualization with a time slider for scrubbing through git history. Opens in your default browser. Runs as a subagent.
+`pmm:viz` generates an interactive D3.js force-directed graph visualization with a time slider for scrubbing through git history. Opens in your default browser. Runs as a subagent.
 
 **Arguments**:
 
@@ -260,9 +304,9 @@ pmm:viz graph
 
 ### `pmm:dump`
 
-**The pain**: Quick health check without leaving the terminal. You don't want to open a browser, you just want to see: which files are active, which are stale, what does the graph look like in text form? Dump gives you ASCII visualization at three levels of detail.
+Quick health check without leaving the terminal. You don't want to open a browser, you just want to see: which files are active, which are stale, what does the graph look like in text form?
 
-**What it does**: Terminal-only memory visualization. No browser, no subagent overhead for simple modes. Runs as a subagent for detailed mode.
+`pmm:dump` provides terminal-only memory visualization. No browser, no subagent overhead for simple modes. Runs as a subagent for detailed mode.
 
 **Arguments**:
 
@@ -290,9 +334,9 @@ pmm:dump summary
 
 ### `pmm:update`
 
-**The pain**: PMM evolves. New skills, new file types, better templates. You don't want to manually diff upstream changes against your installation, figure out what's new, and hand-apply patches — especially when the update adds a new memory file type that needs hydration or changes a hook script. Update handles migration without losing your memory: system files get replaced, your data stays untouched.
+PMM evolves. New skills, new file types, better templates. You don't want to manually diff upstream changes against your installation, figure out what's new, and hand-apply patches — especially when the update adds a new memory file type that needs hydration or changes a hook script.
 
-**What it does**: Checks upstream for a new PMM version, shows what changed, and applies updates to system files only. Never touches `memory/`.
+`pmm:update` handles migration without losing your memory: system files get replaced, your data stays untouched. It checks upstream for a new PMM version, shows what changed, and applies updates to system files only. Never touches `memory/`.
 
 **Arguments**: None.
 
@@ -372,15 +416,59 @@ Installing PMM wires three hooks into your project:
 - **Stop** (`should-save.sh`): Monitors save cadence based on your `config.md` settings. Zero token cost — pure bash counter. When the threshold is reached, blocks exit until a save completes.
 - **SessionEnd** (soft instruction in `session-instructions.md`): Prompts Claude to save before closing. Best-effort — not a blocking hook.
 
+### Triggers: soft and hard
+
+Not all save triggers are equal. Some are deterministic; others depend on Claude following instructions. Understanding the difference explains why some saves are guaranteed and others are best-effort.
+
+**Hard triggers** — the system enforces these automatically:
+
+- **Stop hook** (`should-save.sh`): A bash counter tracks conversation turns against the cadence set in `config.md`. When the threshold is reached, the hook blocks Claude Code from exiting until `pmm:save` completes. Zero token cost — pure bash, no agent dispatch for the counting. The counter increments on every turn; the save fires when the count hits the configured threshold. This is deterministic: if the counter fires, the save happens. No exceptions.
+
+- **SessionStart hook** (`session-start.sh`): Loads Tier 1 memory files into context when Claude Code opens your project. Reads `config.md` to determine which files are active, cats all non-empty Tier 1 files with headers, and injects `session-instructions.md`. Non-blocking — stdout is injected into Claude's context window. This is what gives Claude your memory at session start without manual `@-import` wiring in CLAUDE.md.
+
+**Soft triggers** — guidance Claude follows but cannot enforce:
+
+- **Session-end instruction** (in `session-instructions.md`): Tells Claude to run `pmm:save` before ending a conversation. Claude honors this most of the time but it's best-effort — there's no blocking mechanism for session end. The SessionEnd hook exists in Claude Code's plugin system but has a 1.5-second timeout, which is too short for agent dispatch. So session-end saves rely on Claude reading the instruction and complying.
+
+- **Pre-compact instruction**: Tells Claude to run `pmm:save` before `/compact`. This captures structured memory before context compression — critical because `/compact` discards the conversation detail that `pmm:save` would synthesize from. Claude follows this reliably but it's instruction-based, not hook-enforced.
+
+- **Milestone-driven saves** (default cadence): When save cadence is set to `every-milestone`, Claude recognizes decisions, completions, and lessons as save moments and runs `pmm:save` proactively. This depends on Claude's judgment about what constitutes a milestone — generally reliable for obvious events (explicit decisions, feature completions) but less consistent for subtle ones (gradual preference shifts, implicit lessons).
+
+The distinction matters: hard triggers catch what soft triggers might miss, and soft triggers capture context that hard triggers can't time. A hard trigger fires on a counter — it doesn't know whether a milestone just happened. A soft trigger fires on semantic recognition — it can't guarantee execution. Both are necessary. The Stop hook is your safety net; milestone saves are your signal capture.
+
 ---
 
 ## Memory file tiers
 
-**Tier 1** (always loaded via SessionStart hook):
-`config.md`, `standinginstructions.md`, `last.md`, `progress.md`, `decisions.md`, `lessons.md`, `preferences.md`, `memory.md`, `summaries.md`, `voices.md`, `processes.md`, `timeline.md`
+### Tier 1 — always loaded
 
-**Tier 2** (on demand — read when a query needs them):
-`graph.md`, `vectors.md`, `taxonomies.md`, `assets.md`
+Injected into context by the SessionStart hook at every session start. These are the 12 core files that give Claude your project's memory without manual wiring.
+
+| File | What it stores | Update rule | Trigger |
+|------|---------------|-------------|---------|
+| `config.md` | PMM configuration: save cadence, model selection, active files, context tiers, window sizes, verbosity | Modified only by `pmm:settings` | User runs `pmm:settings` |
+| `standinginstructions.md` | Persistent rules that always apply, regardless of session context. Overrides session-level instructions on conflict | Append-only — never delete or modify existing entries | User issues a persistent directive ("always do X", "never do Y") |
+| `last.md` | Last 3-5 significant actions in detail. The "what just happened" snapshot that orients Claude at session start | Replace entirely on every save | Every `pmm:save` — full content replaced, not appended |
+| `progress.md` | Current milestones, active work, blockers, what's next. The project's current state at a glance | Living document — sections updated in place | State changes: milestone reached, blocker hit, next action shifts, work item completes |
+| `decisions.md` | Committed decisions with rationale and attribution. The canonical record of why things are the way they are | Append-only — newest at top, never modify or delete past entries | A decision is made and committed to. Includes context, alternatives considered, who ratified |
+| `lessons.md` | Mistakes made and lessons learned. What happened, and what to do instead next time | Append-only | A mistake is made, a lesson is explicitly noted, or a pattern is recognized worth preserving |
+| `preferences.md` | User-specific style, quirks, communication patterns, and working habits | Living document — update in place as patterns emerge | User preference observed or explicitly stated; communication pattern noticed over multiple sessions |
+| `memory.md` | Long-term durable facts about the project: architecture, team structure, key context, technical choices | Living document — facts updated as they change | New durable fact established; existing fact changes (e.g., team member joins, architecture shifts) |
+| `summaries.md` | Periodic session rollups — compressed records of past work for quick orientation | Sliding window (max from config, default 10) — oldest entries trimmed, preserved in git history | Session end, major milestone, or when timeline entries are about to be trimmed and need a summary |
+| `voices.md` | Tone profiles for different communication contexts, and internal reasoning lenses for decision-making | Living document | New tone profile defined, existing voice refined, or new reasoning lens established |
+| `processes.md` | Workflows and repeatable procedures that have been established during the project | Living document | New process established or existing process updated based on experience |
+| `timeline.md` | Compressed chronological record of key events and milestones | Sliding window (max from config, default 50) — oldest entries trimmed, preserved in git history | Major milestone or event worth preserving; anything that changes the project's trajectory |
+
+### Tier 2 — on demand
+
+Not loaded at session start. Read into context when a query, hydration, or visualization needs them. Keeps token cost low for routine sessions — most conversations don't need the full graph or vector space.
+
+| File | What it stores | Update rule | Trigger |
+|------|---------------|-------------|---------|
+| `graph.md` | Typed edges between concepts, decisions, entities — the relationship map of your project's knowledge | Append-only edges — relationships are never removed, only added | New relationship discovered between concepts; a decision affects another concept; entity connections identified |
+| `vectors.md` | Semantic similarities between concepts, and concept clusters grouped by meaning | Similarities and clusters are living (rewritten as understanding evolves); embedding registry is append-only | New semantic similarity discovered; cluster formed, revised, or merged; concept proximity changes |
+| `taxonomies.md` | Classification systems, naming conventions, and categorical structures used in the project | Living document | New category or classification established; naming convention locked; terminology standardized |
+| `assets.md` | People, tools, systems, organisations — the entities that exist in the project's world | Living document | New entity introduced (person, tool, system, org); existing entity's metadata changes |
 
 ---
 
