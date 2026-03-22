@@ -29,6 +29,10 @@
     "context-management",
     "context-loss",
     "persistent-context",
-    "context-rot"
+    "context-rot",
+    "claude-code-memory",
+    "decision-log",
+    "claude-code-forgets",
+    "claude-memory-manager"
   ]
 }
