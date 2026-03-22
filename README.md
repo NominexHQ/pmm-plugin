@@ -18,6 +18,7 @@ Markdown files, git-backed. No database, no setup. Decisions tracked with ration
 - **Auto-loads at session start**: The `SessionStart` hook injects Tier 1 files (the 12 essential files) directly into context. Tier 2 files (graph, vectors, taxonomies, assets) load on demand.
 - **Auto-saves**: The `Stop` hook monitors save cadence based on your config. When the threshold is reached, it blocks exit until a save completes. Save manually at any milestone.
 - **Decision history**: Every decision is committed to git with context. `git log` is your memory audit trail — you can trace any choice back to when it was made and why.
+- **Context-switching recall**: Jumping between workstreams? Coming back to something after two days? `pmm:recall` synthesizes a focused briefing from across all memory files — decisions, lessons, current state, what's next — so you can start working without re-reading everything.
 - **Configurable**: model selection (haiku by default), sliding window size, verbosity, repository visibility, PII handling.
 
 ---
@@ -148,6 +149,47 @@ Broad search across all files. Returns a narrative synthesis covering deployment
 **Behaviour notes**:
 - Context-first: if `bootstrap_wired` is set, answers from loaded Tier 1 files without dispatching an agent. Tier 2 files load on demand via the Read tool. Agent dispatch only in eager mode or when bootstrap isn't wired.
 - Beyond-window fallback: if no results found in current files, checks config for `recall_beyond_window` mode (`prompt` or `auto`) before searching git history.
+
+---
+
+### `pmm:recall`
+
+You're working on auth. You switch to deployment for a few hours. You come back to auth two days later. What did you decide? What's the current state? What was the next step? You could grep through memory files, or re-read your timeline, or ask a vague question and hope the answer covers it. Or you could get a briefing.
+
+`pmm:recall` reads across all memory files and synthesizes a focused, actionable briefing for a topic. Not raw search results — working context you can act on immediately. Decisions with rationale, recent activity, lessons learned, current state, next steps. Everything PMM knows about a topic, distilled into something you can start working from.
+
+**Arguments**:
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `[topic]` | No | None | Topic or area to recall (e.g., "auth", "deployment", "database migration") |
+
+**Examples**:
+
+```
+pmm:recall
+```
+Quick resume: last session summary, current state, what's next. The Monday morning command — open your project, run this, start working.
+
+```
+pmm:recall auth
+```
+Focused briefing: recent auth activity, key decisions (with rationale), relevant lessons, current state, next steps. Everything you need to pick up where you left off on auth.
+
+```
+pmm:recall database migration
+```
+Everything PMM knows about the migration — synthesized into working context, not raw search results. Decisions made, problems hit, current progress, what was planned next.
+
+**Use cases**:
+- **Context switching**: You're juggling three workstreams. `pmm:recall [area]` catches you up on whichever one you're switching back to, without re-reading files or scrolling through history.
+- **Monday morning**: `pmm:recall` with no args is your Monday morning fix. One command, and you know where you left off — last session, current state, what's next.
+- **Onboarding onto an area**: New to a part of the codebase? `pmm:recall [area]` gives you the decisions, lessons, and current state for that area — faster than reading through every memory file yourself.
+- **After `/compact`**: Context window just got compressed. `pmm:recall [topic]` rebuilds your working context for whatever you were focused on.
+
+**Behaviour notes**:
+- Context-first: if `bootstrap_wired` is set, reads from loaded Tier 1 files without dispatching an agent. Tier 2 files loaded on demand only when the topic involves relationships, entities, or classifications. Agent dispatch only in eager mode or when bootstrap isn't wired.
+- Differentiation from `pmm:query`: query is search (find specific things, filters, attribution, dump mode). recall is briefing (synthesize working context, actionable output). query answers "what did we decide about X?" — recall answers "catch me up on X so I can start working."
 
 ---
 
@@ -368,6 +410,9 @@ When you activate a new file (`voices.md`, `graph.md`), run `pmm:hydrate <file>`
 
 **Let the tiers work**
 Tier 1 files (12 core files) auto-load at session start. Tier 2 files (graph, vectors, taxonomies, assets) load on demand when a query needs them. This saves ~14k tokens per session. Don't switch to all-in-context unless you have a specific reason — the tiered system is designed for the way developers actually use memory.
+
+**Use recall to context-switch, query to search**
+`pmm:recall auth` gives you a working briefing — decisions, lessons, state, next steps — synthesized and ready to act on. `pmm:query auth` gives you search results — filterable, attributed, with optional deep traversal. Recall is for "catch me up." Query is for "find me that specific thing." Use both, but start with recall when switching workstreams.
 
 **Use query filters to find, not grep**
 `pmm:query` understands attribution (`by user:alex`), dates (`since 2026-03-15`), file scope (`in decisions`), and deep traversal (`deep`). It's not just text search — it follows relationships through the graph and finds semantically related content through vector clusters. Use it instead of grepping memory files manually.
