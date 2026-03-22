@@ -24,19 +24,16 @@ Shared knowledge base for all PMM plugin skills. A skill author reading only thi
 | `vectors.md` | 2 | Semantic similarities, concept clusters, embedding registry — clusters are living, registry is append-only |
 | `taxonomies.md` | 2 | Classification systems, categories, naming conventions — living document |
 | `assets.md` | 2 | Key entities: people, tools, systems, organisations — living document |
-| `BOOTSTRAP.md` | — | Master operating instructions — never edit without explicit user instruction |
 | `secrets.md` | protected | Local-only credential store — gitignored, never read or written by maintain agents |
 
-`config.md` and `BOOTSTRAP.md` are always active. All other files are configurable via `config.md`.
+`config.md` is always active. All other files are configurable via `config.md`.
 
 ---
 
 ## Tier System
 
 **Tier 1 — always loaded**
-The 12 core files loaded into context at session start via direct `@-imports` in `CLAUDE.md`. Always available without a Read tool call. Covers everything needed for session orientation (decisions, lessons, preferences, recent work, standing instructions).
-
-Note: `@-imports` do not recurse in Claude Code. All Tier 1 files must be listed as direct `@-imports` in `CLAUDE.md`, not inside `BOOTSTRAP.md`. Imports inside an imported file are never resolved.
+The 12 core files injected into context at session start by the `SessionStart` hook (`session-start.sh`). Always available without a Read tool call. Covers everything needed for session orientation (decisions, lessons, preferences, recent work, standing instructions). No `CLAUDE.md` changes needed — the hook handles injection automatically when the pmm plugin is installed.
 
 **Tier 2 — on demand**
 The 4 relational/reference files (`graph.md`, `vectors.md`, `taxonomies.md`, `assets.md`). Live on disk. Load via a haiku agent when a request signals a gap that Tier 2 data would fill. Do not load all four by default — only what the request requires.
@@ -74,7 +71,6 @@ Custom files added via `pmm:memory`. Handling is user-specified. Tracked in `mem
 
 **File discipline:**
 - Never bleed content between files — each file has one job
-- `BOOTSTRAP.md` is immutable unless explicitly instructed by the user
 - `standinginstructions.md` takes precedence over session-level instructions when there is a conflict
 - `secrets.md` is never read, written, or referenced by maintain agents — it exists outside the maintain scope
 - `config.md` is read by agents but never modified by them (only by `pmm:settings`)
@@ -131,18 +127,15 @@ git add memory/ && git reset HEAD memory/secrets.md 2>/dev/null; git commit -m "
 | `## Repository Visibility` | `Visibility:` | `public` | PII handling: `public` (handles only, no emails, no verbatim sensitive quotes), `private` (full fidelity) |
 | `## Maintain Agent Model` | `Model:` | `haiku` | Model for maintain agents |
 | `## Readonly Agent Model` | `Readonly model:` / `Model:` | `haiku` | Model for read-only agents (session-start, recall, query, dump) |
-| `## Session Start` | `Mode:` | `lazy` | Session-start behaviour: `lazy` (skip agent if bootstrap_wired), `eager` (always dispatch) |
-| `## Session Start` | `bootstrap_wired:` | `true` | Whether `@memory/BOOTSTRAP.md` is wired into `CLAUDE.md`; enables lazy skip |
+| `## Session Start` | `Mode:` | `lazy` | Session-start behaviour: `lazy` (skip agent, hook handles loading), `eager` (always dispatch agent) |
 | `## Maintain Strategy` | `Strategy:` | `single` | Dispatch strategy: `single` (one agent, all files) or `tiered` (three concurrent agents by dependency tier) |
 | `## Recall Beyond Window` | `Mode:` | `prompt` | Whether to search git history for trimmed entries: `prompt` (ask first), `auto` (silent search) |
-| `## Context Tiers` | `Mode:` | `tiered` | Loading mode: `tiered` (Tier 1 in CLAUDE.md, Tier 2 on demand) or `all-in-context` |
+| `## Context Tiers` | `Mode:` | `tiered` | Loading mode: `tiered` (Tier 1 injected by SessionStart hook, Tier 2 on demand) or `all-in-context` |
 | `## Memory Priority` | `Mode:` | `pmm-first` | How PMM interacts with Claude auto-memory: `pmm-first`, `deduplicate`, `coexist` |
 | `## Active Files` | `<file>: active/inactive` | all active | Which memory files are created and maintained |
 | `## Protected Files` | `secrets.md: protected` | always | Marks `secrets.md` as gitignored/never-touch |
-| `## Protected Files` | `bootstrap_wired:` | `true`/`false` | Cache flag for Bootstrap Check — skip CLAUDE.md reads once wired |
-| `## Protected Files` | `bootstrap_reminder:` | `on`/`off` | Whether to surface missing-wiring prompts |
 
-Skills must not modify `config.md` except for `pmm:settings` (which is the dedicated config management skill) and the bootstrap wiring cache write.
+Skills must not modify `config.md` except for `pmm:settings` (which is the dedicated config management skill).
 
 ---
 
@@ -173,4 +166,4 @@ These apply across all PMM skill operations:
 
 9. **Memory commits go directly to main.** Memory saves are an intentional exception to the project's PR workflow — automated memory saves cannot wait for review. All other code changes follow branch → PR → merge.
 
-10. **`config.md` is read by agents, never written by them.** Only `pmm:settings` modifies config. Exception: the bootstrap wiring cache write (`bootstrap_wired: true`) may be set by any skill that performs a Bootstrap Check.
+10. **`config.md` is read by agents, never written by them.** Only `pmm:settings` modifies config.

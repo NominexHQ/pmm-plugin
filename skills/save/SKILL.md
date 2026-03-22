@@ -114,7 +114,6 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > **Update rules:**
 > - Read each file before editing it
 > - Only update files where the new information is relevant (see trigger table below)
-> - `BOOTSTRAP.md` — NEVER edit
 > - `standinginstructions.md` — append-only, never modify existing entries
 > - `decisions.md` — append-only, newest at top
 > - `lessons.md` — append-only

@@ -64,7 +64,7 @@ Run `pmm:settings` at any time to change these.
 ## Active Files
 
 <!-- Which memory files are active. Deactivated files are not created or loaded. -->
-<!-- config.md and BOOTSTRAP.md are always active. -->
+<!-- config.md is always active. -->
 - memory.md: active
 - assets.md: active
 - decisions.md: active
@@ -94,7 +94,7 @@ Run `pmm:settings` at any time to change these.
 <!-- Whether to dispatch a Phase 2 agent at session start -->
 - Mode: lazy
 <!-- Options: lazy (default) | eager -->
-<!-- lazy: skip Phase 2 agent — Tier 1 files (12 files) in context via direct @-imports in CLAUDE.md; Tier 2 files (graph, vectors, taxonomies, assets) loaded on demand by haiku agent per BOOTSTRAP.md. Requires bootstrap_wired: true. Falls through to eager if bootstrap_wired is false. -->
+<!-- lazy: skip Phase 2 agent — Tier 1 files injected by SessionStart hook; Tier 2 files loaded on demand. Requires pmm plugin installed. -->
 <!-- eager: always dispatch Phase 2 agent to read and synthesise all memory files -->
 
 ## Maintain Strategy
@@ -118,8 +118,8 @@ Run `pmm:settings` at any time to change these.
 <!-- Which files load into context at session start vs on demand -->
 - Mode: tiered
 <!-- Options: tiered (default) | all-in-context -->
-<!-- tiered: Tier 1 files loaded via @-imports; Tier 2 read on demand. Saves ~14k tokens. -->
-<!-- all-in-context: all active files loaded via @-imports (pre-v1.8.0 behaviour) -->
+<!-- tiered: Tier 1 files injected by SessionStart hook; Tier 2 read on demand. Saves ~14k tokens. -->
+<!-- all-in-context: all active files injected by SessionStart hook -->
 
 ### Tier 1 (always loaded)
 - config.md: tier-1
@@ -155,8 +155,8 @@ Run `pmm:settings` at any time to change these.
 <!-- Should PMM instruct Claude to save before /compact? -->
 - pre_compact: on
 <!-- Options: on (default) | off -->
-<!-- on: BOOTSTRAP.md soft instruction directs Claude to save before compact. No hook involved — Claude Code's PreCompact hook is non-blocking and has been removed. -->
-<!-- off: suppress the pre-compact save instruction in BOOTSTRAP.md entirely -->
+<!-- on: session-instructions.md soft instruction directs Claude to save before compact. -->
+<!-- off: suppress the pre-compact save instruction in session-instructions.md entirely -->
 
 ## Protected Files
 
@@ -169,13 +169,6 @@ Run `pmm:settings` at any time to change these.
 <!-- never: pre-commit hook blocks any commit containing memory/secrets.md -->
 <!-- allow-with-warning: hook warns but does not block. Only use if you understand the implications: -->
 <!--   secrets.md contents will be in git history and pushed to your remote — irreversible for public repos -->
-- bootstrap_reminder: on
-<!-- bootstrap_reminder options: on (default) | off -->
-<!-- on: PMM will prompt to wire @memory/BOOTSTRAP.md into CLAUDE.md if not already done -->
-<!-- off: suppress the reminder permanently (memory auto-load relies on manual skill triggers) -->
-- bootstrap_wired: false
-<!-- bootstrap_wired options: false (default) | true -->
-<!-- true: @memory/BOOTSTRAP.md is confirmed wired in CLAUDE.md — Bootstrap Check skips file reads -->
 ```
 
 ---
@@ -214,8 +207,9 @@ Current installation: this project. Upstream: https://github.com/NominexHQ/poor-
 This project uses a structured memory system in the `memory/` folder.
 
 **Tier 1 files** (config, standinginstructions, last, progress, decisions, lessons,
-preferences, memory, summaries, voices, processes, timeline) are loaded into context via
-direct @-imports in CLAUDE.md — always available, no agent needed.
+preferences, memory, summaries, voices, processes, timeline) are injected into context
+by the PMM `SessionStart` hook at session open — always available, no agent needed.
+No CLAUDE.md changes required.
 
 **Tier 2 files** (graph, vectors, taxonomies, assets) are on disk. Before responding to a
 request, check for **gaps**: places where Tier 1 context + the current request point to
@@ -311,7 +305,7 @@ git add memory/ && git reset HEAD memory/secrets.md 2>/dev/null; git commit -m "
 ```markdown
 # Memory
 
-Long-term facts about the user's project — the codebase PMM is installed into. Not about PMM itself (see BOOTSTRAP.md).
+Long-term facts about the user's project — the codebase PMM is installed into.
 Updated when new durable facts are established.
 
 ## Project

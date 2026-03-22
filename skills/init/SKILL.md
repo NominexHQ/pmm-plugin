@@ -162,7 +162,6 @@ Run `pmm:settings` at any time to change these.
 ## Session Start
 
 - Mode: lazy
-- bootstrap_wired: true
 
 ## Maintain Strategy
 
@@ -193,8 +192,6 @@ Run `pmm:settings` at any time to change these.
 
 - secrets.md: protected
 - secrets_git: never
-- bootstrap_reminder: on
-- bootstrap_wired: true
 ```
 
 ---
@@ -209,7 +206,7 @@ Dispatch a `general-purpose` agent using the `Readonly Agent Model` from config 
 > 2. Read `references/templates.md` for the initial content of each file.
 > 3. Read `memory/config.md` to determine which files are active.
 > 4. Create the `memory/` directory if it doesn't exist.
-> 5. Always create `memory/BOOTSTRAP.md` — use the template from `references/templates.md`. In the BOOTSTRAP.md content, note that the SessionStart hook handles Tier 1 loading; there is no need to wire @memory/BOOTSTRAP.md into CLAUDE.md manually.
+> 5. Always create `memory/BOOTSTRAP.md` — use the template from `references/templates.md`.
 > 6. `memory/config.md` is already written — skip it.
 > 7. For each file marked `active` in config.md, create it using its template from `references/templates.md`. Skip `inactive` files.
 > 8. Always create `memory/secrets.md` from its template — it is local-only and gitignored regardless of the active files list.
@@ -277,9 +274,8 @@ Tell the user:
 ## Rules
 
 - Never overwrite an existing `memory/` installation. Check first (Step 1).
-- No Bootstrap Check logic. Hooks replace BOOTSTRAP.md wiring — `bootstrap_wired: true` is set in config by default.
 - File structure rules and file-by-file operating rules are in `references/core.md` — do not duplicate them here.
 - Templates for each memory file are in `references/templates.md`.
 - Agents edit files only. Main context handles all git commands.
 - `memory/secrets.md` is always created, always gitignored, never committed.
-- The SessionStart hook injects Tier 1 files into context at session start — this replaces the old BOOTSTRAP.md @-import wiring approach.
+- The SessionStart hook injects Tier 1 files into context at session start. No CLAUDE.md changes needed.

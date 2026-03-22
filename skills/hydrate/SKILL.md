@@ -195,7 +195,7 @@ In force mode, the agent prompt is identical — the distinction is only in whet
 ## Rules
 
 - `secrets.md` is never touched — excluded from all hydration operations, batch or single
-- `config.md` and `BOOTSTRAP.md` are never hydration targets — they control the system, not record history
+- `config.md` is never a hydration target — it controls the system, not records history
 - Agents edit files only — main context handles all git commits
 - Background agents (`run_in_background: true`) do not inherit Edit/Write permissions — always dispatch as foreground agents
 - For batch mode, dispatch ONE agent for all targets — do not dispatch one agent per file (reads context once, writes all targets)

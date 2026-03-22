@@ -43,7 +43,7 @@ Map question type to target file(s):
 Extract from `$ARGUMENTS`:
 
 - **Keyword / question** — everything that is not a filter or modifier
-- **Attribution filter** — `by namespace:name` (e.g. `by user:<name>`, `by agent:<name>`)
+- **Attribution filter** — `by namespace:name` (e.g. `by user:raffi`, `by agent:leith`)
 - **Date filter** — `since YYYY-MM-DD` or `before YYYY-MM-DD`
 - **File scope** — `in <filename>` (e.g. `in decisions`, `in lessons`) — search only that file
 - **Deep flag** — presence of the word `deep` → set deep=true, remove from keyword
@@ -51,11 +51,11 @@ Extract from `$ARGUMENTS`:
 
 ### Step 2 — Context-First Routing
 
-**Read `memory/config.md` for `Session Start` and `bootstrap_wired`.**
+**Read `memory/config.md` for `Session Start` mode.**
 
-**If `Mode: lazy` AND `bootstrap_wired: true`** — memory files are already in context. Execute Steps 3–6 directly in the main context window without dispatching any agent. Tier 1 files are in-context. For Tier 2 files (graph.md, vectors.md, taxonomies.md, assets.md), use the Read tool to load the relevant file before searching — do not load all four, only what the routing table requires.
+**If `Mode: lazy`** — memory files are already in context (injected by the SessionStart hook). Execute Steps 3–6 directly in the main context window without dispatching any agent. Tier 1 files are in-context. For Tier 2 files (graph.md, vectors.md, taxonomies.md, assets.md), use the Read tool to load the relevant file before searching — do not load all four, only what the routing table requires.
 
-**If `Mode: eager` OR `bootstrap_wired: false`** — fall through to Agent Dispatch at the end of this document.
+**If `Mode: eager`** — fall through to Agent Dispatch at the end of this document.
 
 ### Step 3 — Search
 
@@ -137,7 +137,7 @@ Rules:
 - Write in concise, direct prose — answer the question, don't describe what files say
 - Weave evidence from multiple source files into a coherent response
 - Cite sources inline as parentheticals: `(decisions.md)`, `(timeline.md, 2026-03-17)`
-- Preserve attribution tags inline where relevant: `[user:name]`
+- Preserve attribution tags inline where relevant: `[user:raffi]`
 - For deep-mode results, note provenance naturally: "A related concept, X (via graph), also shows..."
 - For git history results: "(from git history, commit abc1234)"
 - End with a single `Sources:` footer line listing all files that contributed
@@ -186,9 +186,9 @@ Found: N result(s) in M file(s)
 
 ---
 
-## Agent Dispatch (eager mode / bootstrap not wired)
+## Agent Dispatch (eager mode)
 
-**Used only when `Mode: eager` OR `bootstrap_wired: false`.**
+**Used only when `Mode: eager`.**
 
 Dispatch a `general-purpose` agent using the `Readonly Agent Model` from `memory/config.md` (default: `haiku`). Replace `<project-root>` with the actual project root path and `<user-query>` with `$ARGUMENTS`.
 
@@ -273,7 +273,7 @@ Output the agent's return value verbatim.
 
 ## Notes
 
-- Context-first path is the default when `session_start: lazy` and `bootstrap_wired: true`. This eliminates agent dispatch for in-window queries.
+- Context-first path is the default when `session_start: lazy` (hook-loaded sessions). This eliminates agent dispatch for in-window queries.
 - Agent dispatch is the fallback for eager mode or unwired sessions — file reads happen inside the agent.
 - Phase 4 Recall in the main session handles implicit recall mid-conversation. This skill is the explicit, filterable version.
 - Model selection follows `Readonly Agent Model` in `memory/config.md` (default: `haiku`). No reasoning required for read-only traversal.
