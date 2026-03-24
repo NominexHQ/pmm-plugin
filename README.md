@@ -551,7 +551,9 @@ Not loaded at session start. Read into context when a query, hydration, or visua
 - **Git**: 2.5+
 - **Claude Code**: Latest version with plugin support
 
-PMM installs as a plugin via `claude plugin install` — no symlinks needed for the core experience. Local skill variants (hyphenated names like `pmm-save`) use symlinks and are optional.
+PMM installs as a plugin via `claude plugin install` — no symlinks needed for the core experience. All colon-namespaced skills (`pmm:save`, `pmm:query`, etc.) work on every platform without symlinks.
+
+**Cowork compatibility note**: The hyphenated local skill variants (`pmm-save`, `pmm-query`, etc.) are created by `pmm:init-local-skills` using symlinks. On Windows without Developer Mode enabled, symlink creation will fail and these local variants will not be available. The colon-namespaced plugin skills remain fully functional — the local variants are a Cowork-specific fallback, not the primary interface.
 
 ---
 
