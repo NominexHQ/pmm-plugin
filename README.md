@@ -10,6 +10,12 @@ PMM fixes that. Every session, Claude loads what it already knows, then adds to 
 
 Markdown files, git-backed. No database, no setup. Decisions tracked with rationale — not just what, but why. git log is your memory audit trail. Memory that compounds, not rots.
 
+## Install
+
+```bash
+claude plugin install pmm
+```
+
 ---
 
 ## What it does
