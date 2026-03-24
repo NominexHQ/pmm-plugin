@@ -14,8 +14,10 @@ set -euo pipefail
 
 MEMORY_DIR="./memory"
 
-# No memory dir = PMM not initialised. Exit silently.
+# No memory dir = PMM not initialised. Show help hint.
 if [[ ! -d "$MEMORY_DIR" ]]; then
+  echo "PMM not initialized. Run /pmm:init to get started."
+  echo "Docs: https://github.com/NominexHQ/poor-man-memory"
   exit 0
 fi
 
