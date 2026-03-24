@@ -142,6 +142,7 @@ Each memory file has a standard header template. Key patterns:
 ## 3. Memory Isolation
 
 PMM is the foundation layer. Each agent's `memory/` directory is its own PMM instance.
+Isolation is enforced at three levels: PMM, Crew, and Coordinator.
 
 ### Principle
 
@@ -157,20 +158,44 @@ vera:discuss), not through file reads.
   individual capability
 - **Ownership clarity**: each memory file has exactly one agent responsible for its content
 
-### Enforcement
+### Enforcement — Three Levels
 
-Currently: convention + skill design. Skills are scoped to operate on a single agent's
-memory directory. The `memory/` path is resolved from the agent's config, not hardcoded.
+#### Level 1: PMM (maintain agent boundary)
 
-To be formalized:
-- Path validation in maintain agents (reject writes outside own memory dir)
-- Pre-commit hook check for cross-agent memory file modifications
-- Skill dispatch includes explicit memory scope parameter
+The maintain agent prompt includes `{working_directory}` scoping. Enforcement rule
+(included in the maintain agent prompt):
+
+> You MUST NOT read or write files outside `{working_directory}/memory/`. If a requested
+> path resolves outside this directory, refuse the operation and report the violation.
+
+This is prompt-level enforcement. No filesystem ACLs, no code gates. The maintain agent
+is the only writer — constraining it constrains all PMM writes.
+
+#### Level 2: Crew (section ownership)
+
+Crew-owned files (`spec.md`, `eval-log.md`, etc.) use `<!-- owner: agent -->` and
+`<!-- owner: coordinator -->` section markers. Before writing to a section, the writer
+verifies the `<!-- owner: -->` marker matches its role:
+
+- Agent maintain → writes only to `<!-- owner: agent -->` sections
+- Coordinator (vera) → writes only to `<!-- owner: coordinator -->` sections
+
+Schema version gating (`crew-schema-version: 1`) is already enforced — vera checks
+the version before writing. Section ownership adds the per-block constraint.
+
+#### Level 3: Coordinator (dispatch isolation)
+
+Agents dispatched via `vera:task`, `vera:sprint`, or `vera:discuss` receive ONLY their
+own memory context. The coordinator never injects Agent A's memory into Agent B's
+dispatch prompt. Cross-agent knowledge flows through conversation, not context injection.
+
+Vera reads any agent's files for coordination (roster, dispatch weights, eval planning).
+Vera does not write to agent memory files — reads only.
 
 ### Exceptions
 
 - **Vera** reads agent memory files for coordination (roster, hydration planning, eval).
-  Vera does not write to agent memory files -- reads only.
+  Vera does not write to agent memory files — reads only.
 - **PMM status/dump** may read across agents for reporting. Read-only, no writes.
 
 ### Eval Memory Isolation (Cross-Reference)
