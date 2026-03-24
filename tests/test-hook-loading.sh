@@ -18,7 +18,42 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_SCRIPT="$SCRIPT_DIR/../hooks/scripts/session-start.sh"
 PLUGIN_ROOT="$SCRIPT_DIR/.."
-REAL_PROJECT_ROOT="/Users/rffsml/Claude/Projects/nominex-hq"
+# Project root: accept env var, walk up from script dir, or fall back to synthetic fixtures
+if [[ -n "${PROJECT_ROOT:-}" ]]; then
+  REAL_PROJECT_ROOT="$PROJECT_ROOT"
+elif [[ -d "$SCRIPT_DIR/../../../../memory" ]]; then
+  REAL_PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+else
+  # Create synthetic test fixtures for CI/external contributors
+  REAL_PROJECT_ROOT="$(mktemp -d)"
+  SYNTHETIC=1
+  mkdir -p "$REAL_PROJECT_ROOT/memory"
+  cat > "$REAL_PROJECT_ROOT/memory/config.md" << 'FIXTURE'
+# PMM Config
+pmm_version: 2.4.0
+save_cadence: manual
+commit_behaviour: auto
+session_start_mode: hook
+FIXTURE
+  cat > "$REAL_PROJECT_ROOT/memory/last.md" << 'FIXTURE'
+# Last Session
+Session 1 — Test fixture for CI.
+FIXTURE
+  cat > "$REAL_PROJECT_ROOT/memory/timeline.md" << 'FIXTURE'
+# Timeline
+**[Session 1 / 2026-01-01]** — Test fixture entry.
+**[Session 2 / 2026-01-02]** — Second test fixture entry.
+FIXTURE
+  cat > "$REAL_PROJECT_ROOT/memory/decisions.md" << 'FIXTURE'
+# Decisions
+**D-001** — Test decision fixture.
+**D-002** — Second test decision fixture.
+FIXTURE
+  cat > "$REAL_PROJECT_ROOT/memory/progress.md" << 'FIXTURE'
+# Progress
+Test fixture.
+FIXTURE
+fi
 REAL_MEMORY_DIR="$REAL_PROJECT_ROOT/memory"
 
 # ── test harness ──────────────────────────────────────────────────────────────
@@ -555,5 +590,10 @@ if [[ "${#FAILURES[@]}" -gt 0 ]]; then
 fi
 
 printf '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+
+# Clean up synthetic fixtures if created
+if [[ "${SYNTHETIC:-0}" -eq 1 && -d "$REAL_PROJECT_ROOT" ]]; then
+  rm -rf "$REAL_PROJECT_ROOT"
+fi
 
 [[ "$FAIL" -eq 0 ]]
