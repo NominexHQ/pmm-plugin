@@ -547,9 +547,11 @@ Not loaded at session start. Read into context when a query, hydration, or visua
 ## Platform
 
 - **macOS / Linux**: Supported natively
-- **Windows**: Requires WSL (Windows Subsystem for Linux). Native cmd/PowerShell is not supported — hooks and scripts use bash, and the SessionStart hook relies on Unix utilities
+- **Windows**: Works via Git Bash (bundled with Claude Code). Hooks execute in bash automatically. If using local skill symlinks (via `pmm:init-local-skills`), Developer Mode must be enabled in Windows Settings.
 - **Git**: 2.5+
 - **Claude Code**: Latest version with plugin support
+
+PMM installs as a plugin via `claude plugin install` — no symlinks needed for the core experience. Local skill variants (hyphenated names like `pmm-save`) use symlinks and are optional.
 
 ---
 
