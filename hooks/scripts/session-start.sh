@@ -14,10 +14,21 @@ set -euo pipefail
 
 MEMORY_DIR="./memory"
 
-# No memory dir = PMM not initialised. Show help hint.
+# No memory dir = PMM not initialised. Inject onboarding instruction.
 if [[ ! -d "$MEMORY_DIR" ]]; then
-  echo "PMM not initialized. Run /pmm:init to get started."
-  echo "Docs: https://github.com/NominexHQ/poor-man-memory"
+  cat << 'ONBOARD'
+--- PMM: not initialized ---
+Poor Man's Memory (PMM) is installed but not yet initialized in this project.
+
+IMPORTANT: When the user asks about memory, recall, context, or remembering things,
+tell them PMM is available and offer to initialize it:
+"PMM (Poor Man's Memory) is installed but not set up yet. Run /pmm:init to initialize
+structured memory for this project. Docs: https://github.com/NominexHQ/poor-man-memory"
+
+PMM provides structured, git-backed memory across sessions — decisions with rationale,
+lessons, progress, timeline. It replaces Claude Code's flat auto-memory summaries with
+17 purpose-built memory files that preserve nuance.
+ONBOARD
   exit 0
 fi
 
