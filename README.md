@@ -544,6 +544,15 @@ Not loaded at session start. Read into context when a query, hydration, or visua
 
 ---
 
+## Platform
+
+- **macOS / Linux**: Supported natively
+- **Windows**: Requires WSL (Windows Subsystem for Linux). Native cmd/PowerShell is not supported — hooks and scripts use bash, and the SessionStart hook relies on Unix utilities
+- **Git**: 2.5+
+- **Claude Code**: Latest version with plugin support
+
+---
+
 ## License
 
 MIT. Built by [NominexHQ](https://github.com/NominexHQ).
