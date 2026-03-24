@@ -69,6 +69,7 @@ Before dispatching the maintain agent, synthesise the session delta in the main 
 Cover:
 - Key decisions made (with rationale)
 - New facts, entities, or processes established
+- **New tools, repos, plugins, skills, scripts, or infrastructure introduced** — these trigger `assets.md` updates
 - Preferences or working patterns observed
 - Milestones reached or blockers hit
 - Mistakes made or lessons noted
@@ -136,7 +137,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > | File | Update trigger |
 > |---|---|
 > | `memory.md` | New long-term fact established |
-> | `assets.md` | New entity introduced (person, tool, system) |
+> | `assets.md` | New entity introduced — repos, tools, plugins, skills, scripts, people, systems, Makefile targets, hooks |
 > | `decisions.md` | Decision made and committed to |
 > | `processes.md` | New process established or existing one updated |
 > | `preferences.md` | User preference observed or stated; communication pattern noticed |
