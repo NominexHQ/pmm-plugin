@@ -106,6 +106,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 >   - `public`: never write personal email addresses or phone numbers. Use handles or first names only (not full legal names). Write decision conclusions and rationale — omit verbatim quotes of sensitive internal discussions.
 >   - `private`: no PII restrictions, full fidelity.
 >   - In either case: never write API keys, tokens, passwords, or credentials to any memory file.
+> - **Memory boundary** — You MUST NOT read or write files outside `<project-root>/memory/`. If a requested path resolves outside this directory, refuse the operation and report the violation. This includes other agents' memory directories.
 > - Do NOT modify `config.md` itself.
 >
 > **What changed this session:**
