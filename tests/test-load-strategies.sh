@@ -13,7 +13,36 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_SCRIPT="$SCRIPT_DIR/../hooks/scripts/session-start.sh"
-REAL_MEMORY_DIR="/Users/rffsml/Claude/Projects/nominex-hq/memory"
+# Memory dir: accept env var, walk up, or create synthetic fixtures
+if [[ -n "${PROJECT_ROOT:-}" ]]; then
+  REAL_MEMORY_DIR="$PROJECT_ROOT/memory"
+elif [[ -d "$SCRIPT_DIR/../../../../memory" ]]; then
+  REAL_MEMORY_DIR="$(cd "$SCRIPT_DIR/../../../.." && pwd)/memory"
+else
+  _SYNTH=$(mktemp -d)
+  REAL_MEMORY_DIR="$_SYNTH/memory"
+  mkdir -p "$REAL_MEMORY_DIR"
+  cat > "$REAL_MEMORY_DIR/config.md" << 'FIX'
+# PMM Configuration
+## Active Files
+- memory.md: active | full
+- config.md: active | full
+- standinginstructions.md: active | full
+- last.md: active | full
+- progress.md: active | full
+- decisions.md: active | tail:10
+- lessons.md: active | tail:5
+- preferences.md: active | full
+- summaries.md: active | full
+- voices.md: active | full
+- processes.md: active | full
+- timeline.md: active | tail:5
+FIX
+  for f in memory.md standinginstructions.md last.md progress.md decisions.md lessons.md preferences.md summaries.md voices.md processes.md timeline.md; do
+    echo "# $(basename $f .md | sed 's/.*/\u&/')" > "$REAL_MEMORY_DIR/$f"
+  done
+  _SYNTH_LOAD=1
+fi
 
 # ── test harness ─────────────────────────────────────────────────────────────
 
@@ -487,7 +516,14 @@ fi
 section "Category 3: vera-* Parity (structural checks)"
 printf '  hook strategy affects session start only, not on-demand reads by skills\n'
 
-SKILL_ROOT="/Users/rffsml/Claude/Projects/nominex-hq/.claude/skills"
+# Skill root: accept env var or walk up
+if [[ -n "${PROJECT_ROOT:-}" ]]; then
+  SKILL_ROOT="$PROJECT_ROOT/.claude/skills"
+elif [[ -d "$SCRIPT_DIR/../../../../.claude/skills" ]]; then
+  SKILL_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)/.claude/skills"
+else
+  SKILL_ROOT="$SCRIPT_DIR/../skills"
+fi
 
 find_skill() {
   local name="$1"
@@ -610,5 +646,8 @@ if [[ "${#FAILURES[@]}" -gt 0 ]]; then
 fi
 
 printf '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+
+# Clean up synthetic fixtures
+[[ "${_SYNTH_LOAD:-0}" -eq 1 ]] && rm -rf "$_SYNTH" 2>/dev/null
 
 [[ "$FAIL" -eq 0 ]]
