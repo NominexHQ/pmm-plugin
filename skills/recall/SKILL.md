@@ -164,4 +164,4 @@ Output the agent's return value verbatim.
 - Context-first path is the default when `session_start: lazy` and `bootstrap_wired: true`. This eliminates agent dispatch for in-window recall.
 - Agent dispatch is the fallback for eager mode or unwired sessions — file reads happen inside the agent.
 - Model selection follows `Readonly Agent Model` in `memory/config.md` (default: `haiku`). No reasoning required for read-only synthesis.
-- For the full memory file reference, see `references/core.md`.
+- For the full memory file reference, see `references/README.md`.

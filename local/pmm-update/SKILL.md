@@ -132,7 +132,7 @@ If user approves, dispatch a `general-purpose` agent:
 
 ### Phase 4 — Post-update (main context)
 
-1. **Check for new memory file types**: Compare upstream `${CLAUDE_PLUGIN_ROOT}/references/templates.md` to local. If new templates exist and user has `memory/` directory, create new files and trigger Phase 5 (Hydrate) per `${CLAUDE_PLUGIN_ROOT}/references/core.md`.
+1. **Check for new memory file types**: Compare upstream `${CLAUDE_PLUGIN_ROOT}/references/templates.md` to local. If new templates exist and user has `memory/` directory, create new files and trigger Phase 5 (Hydrate) per `${CLAUDE_PLUGIN_ROOT}/references/README.md`.
 
 2. **Reinstall the pre-commit hook** (in case `pmm/hooks/pre-commit` was updated):
    ```bash

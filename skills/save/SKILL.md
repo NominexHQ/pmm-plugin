@@ -22,7 +22,7 @@ Read `memory/config.md`. Extract:
 - `Active Files` — which files are currently active
 - `Repository Visibility` — `public` or `private` (controls PII handling)
 
-File rules are in `references/core.md`. Don't re-read it on every save — the rules are loaded in context via the plugin's SessionStart hook.
+File rules are in `references/README.md`. Don't re-read it on every save — the rules are loaded in context via the plugin's SessionStart hook.
 
 ---
 
@@ -119,7 +119,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > - `standinginstructions.md` — append-only, never modify existing entries
 > - `decisions.md` — append-only, newest at top
 > - `lessons.md` — append-only
-> - `graph.md` — append-only edges, use typed relationships per `references/core.md` graph syntax
+> - `graph.md` — append-only edges, use typed relationships per `references/README.md` graph syntax
 > - `vectors.md` — similarities/clusters are living (update in place), embedding registry is append-only
 > - `timeline.md` — sliding window, trim to configured max (oldest entries first). Full history is in git. When entries are about to be trimmed, summarise the batch and append to `summaries.md` first.
 > - `summaries.md` — sliding window, trim to configured max. Full history is in git.

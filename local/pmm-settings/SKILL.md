@@ -171,7 +171,7 @@ If active files changed OR context tier mode changed:
 - Tier 2 files: graph, vectors, taxonomies, timeline, summaries, memory, assets
 - If files were deactivated, do NOT delete them — just remove them from the file list
 - If files were activated that don't exist yet, create them from templates in `${CLAUDE_PLUGIN_ROOT}/references/templates.md`
-- **For each newly activated file**, dispatch Phase 5 (Hydrate) using the prompt from `${CLAUDE_PLUGIN_ROOT}/references/core.md`. This ensures activated files start with synthesized content from existing memory, not empty templates. Commit hydrated files separately: `git add memory/<file> && git commit -m "memory: hydrate <file> from existing context"`
+- **For each newly activated file**, dispatch Phase 5 (Hydrate) using the prompt from `${CLAUDE_PLUGIN_ROOT}/references/README.md`. This ensures activated files start with synthesized content from existing memory, not empty templates. Commit hydrated files separately: `git add memory/<file> && git commit -m "memory: hydrate <file> from existing context"`
 
 ### Step 4 — Commit
 
