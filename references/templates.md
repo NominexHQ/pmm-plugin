@@ -389,7 +389,27 @@ Ratified by: [user / consensus / default]
 Workflows and processes developed or established during this project.
 Updated when new processes are created or existing ones change.
 
-<!-- Format: ## Process Name, then steps or description -->
+## Operating Discipline
+
+Mandatory behaviors. These apply every session regardless of context.
+
+### Before claiming ignorance ("I don't know", "I don't have that")
+- Search Tier 1 memory files (memory.md, decisions.md, lessons.md, standinginstructions.md)
+- Search Tier 2 files (btw.md, assets.md, graph.md)
+- If not found, check git history (git log -S "term" or pmm:recall)
+- Only say "I don't have it" after exhausting these sources
+
+### Before changing file structure or conventions
+- Check decisions.md for prior decisions about naming/structure
+- Check memory.md for recorded conventions
+- If no prior decision exists, state the choice and get confirmation before acting
+
+### Before /compact
+- Run pmm:save first to capture structured memory before compression
+
+### Memory authority
+- PMM files are the source of truth over native auto-memory
+- When there's a conflict, PMM wins
 ```
 
 ---
