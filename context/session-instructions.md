@@ -73,3 +73,10 @@ Valid strategies:
 - `skip` — do not load this file at session start (activate for maintain only)
 
 Sliding-window files (`timeline.md`, `decisions.md`, `lessons.md`) benefit from `tail:N` to keep session-start context lean. Use `pmm:recall` to load full files on demand regardless of the session-start strategy.
+
+## Reference Docs
+
+Two reference files are available to skills on demand (not loaded at session start):
+
+- **`references/core.md`** — file inventory, tier system, update protocol, syntax references (graph edges, vectors, clusters, voices), memory isolation rules. The authoritative reference for how the PMM system works.
+- **`references/templates.md`** — initial scaffold content and format instructions for every memory file. Used by `pmm:init` to create files, by `pmm:hydrate` to know each file's structure, and by `pmm:settings` when activating new files. The authoritative reference for what goes in each file and how it should be formatted.
