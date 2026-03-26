@@ -12,8 +12,18 @@ Markdown files, git-backed. No database, no setup. Decisions tracked with ration
 
 ## Install
 
+### Official marketplace
+
 ```bash
-claude plugin install pmm
+claude plugin marketplace add anthropics/claude-plugins-official
+claude plugin install pmm@claude-plugins-official
+```
+
+### Community mirror
+
+```bash
+claude plugin marketplace add anthropics/claude-plugins-community
+claude plugin install pmm@claude-community
 ```
 
 ---
