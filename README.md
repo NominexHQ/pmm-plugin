@@ -15,7 +15,7 @@ Markdown files, git-backed. No database, no setup. Decisions tracked with ration
 ### Official marketplace
 
 ```bash
-claude plugin install pmm
+claude plugin install pmm@claude-plugins-official
 ```
 
 ### Community mirror
