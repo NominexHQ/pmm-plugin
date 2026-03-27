@@ -47,7 +47,7 @@ Use `AskUserQuestion` to present the same questions from Phase 1 of the main ski
 - Every N messages — specify a number (e.g. every 5 messages)
 - On explicit request only — only when you ask
 
-*Note: For fine-grained control, use `/loop` to run a save prompt on a recurring interval.*
+*Note: For frequent saves, choose `every-N-messages` — hooks handle the trigger automatically.*
 
 **Q2: Commit behaviour** — When should changes be committed to git?
 - Auto-commit after every update batch (default)
@@ -64,36 +64,42 @@ Use `AskUserQuestion` to present the same questions from Phase 1 of the main ski
 - Heavy (100 / 20)
 - Unlimited (no trimming)
 
-**Q5: Verbosity** — How should memory updates be communicated?
+**Q5: Decay pruning (Advanced)** — Enable relevance-based pruning for append-only files?
+- Disabled (default) — append-only files grow without limit
+- Enabled — entries decay over time if unreferenced; pruned below threshold
+
+*Note: When enabled, the maintain agent tracks relevance via inline HTML comment tags. Conservative defaults: decay 0.90, reinforce 1.05, prune at 0.30. Per-file overrides available in config.md.*
+
+**Q6: Verbosity** — How should memory updates be communicated?
 - Silent — agent status indicator only
 - Summary (default) — one-line confirmation
 - Verbose — full detail
 
-**Q6: Repository visibility** — Is this repository public or private?
+**Q7: Repository visibility** — Is this repository public or private?
 - Public (default) — maintain agent avoids personal emails, uses handles over full names, summarises sensitive decisions
 - Private — no PII restrictions, full fidelity in all files
 
-**Q7: Maintain agent model** — Which model should handle memory updates?
+**Q8: Maintain agent model** — Which model should handle memory updates?
 - Haiku (default) — fastest and cheapest, good for mechanical file edits
 - Sonnet — balanced, better at nuanced updates
 - Opus — most capable, highest cost
 
-*Note: Session-start and recall agents use the Readonly Agent Model (Q11 below).*
+*Note: Session-start and recall agents use the Readonly Agent Model (Q12 below).*
 
-**Q8: Maintain strategy** — How should memory saves dispatch agents?
+**Q9: Maintain strategy** — How should memory saves dispatch agents?
 - Single (default) — all files updated in one agent dispatch per save (minimises token/message overhead, budget-friendly)
 - Tiered — 3 concurrent agents grouped by file dependency (faster for large installations with many active files)
 
 *Explain: Single mode saves 2 agent dispatches per /pmm:save. Tiered mode is faster if you have a large memory installation and need parallel tier updates — but costs 3x the agent dispatches.*
 
-**Q9: Secrets in git** — Should `memory/secrets.md` be committed to git?
+**Q10: Secrets in git** — Should `memory/secrets.md` be committed to git?
 - Never (default) — pre-commit hook blocks any commit containing secrets.md
 - Allow with warning — hook warns but does not block. **Only use this if you understand the implications: secrets.md contents will be in git history and permanently exposed if pushed to a public remote.**
 
-**Q10: Active files** — Which memory files to activate? (multi-select, config.md always active)
+**Q11: Active files** — Which memory files to activate? (multi-select, config.md always active)
 - memory.md, assets.md, decisions.md, processes.md, preferences.md, voices.md, lessons.md, timeline.md, summaries.md, progress.md, last.md, graph.md, vectors.md, taxonomies.md, standinginstructions.md
 
-**Q11: Readonly agent model** — Which model should handle read-only operations (session-start, recall, pmm:query, pmm:dump, pmm:status, pmm:viz)?
+**Q12: Readonly agent model** — Which model should handle read-only operations (session-start, recall, pmm:query, pmm:dump, pmm:status, pmm:viz)?
 - Haiku (default) — cheapest, ~95% cheaper than Opus. Ideal for mechanical reads.
 - Sonnet — balanced, ~73% cheaper than Opus. Better at synthesis.
 - Opus — most capable, highest cost.
@@ -101,36 +107,36 @@ Use `AskUserQuestion` to present the same questions from Phase 1 of the main ski
 
 *Haiku is strongly recommended — read-only agents do simple file I/O and retrieval, not nuanced reasoning.*
 
-**Q12: Session start mode** — How should PMM load memory at session start?
+**Q13: Session start mode** — How should PMM load memory at session start?
 - Lazy (default) — skip Phase 2 agent; memory files are already in context via plugin SessionStart hook. Saves ~33k tokens per session. Requires pmm plugin to be installed.
 - Eager — always dispatch a Phase 2 agent to read and synthesise all memory files (pre-v1.5.0 behaviour)
 
 *Lazy mode works automatically when the pmm plugin is installed — the SessionStart hook handles loading.*
 
-**Q13: Recall beyond window** — When a recall query isn't found in the current memory window, should PMM ask before searching git history?
+**Q14: Recall beyond window** — When a recall query isn't found in the current memory window, should PMM ask before searching git history?
 - Prompt (default) — ask permission before dispatching an agent to search git history (one agent dispatch per beyond-window query)
 - Auto — silently search git history when needed, without prompting (costs 1 agent dispatch per miss)
 
 *In lazy mode, all active memory files are already in context — git history is only needed for entries that have been trimmed from sliding-window files (timeline.md, summaries.md). Most queries will be answered from context without any agent dispatch.*
 
-**Q14: Pre-compact hook** — Should PMM save before `/compact`?
+**Q15: Pre-compact hook** — Should PMM save before `/compact`?
 - On (default) — session-instructions.md soft instruction directs Claude to save before compact
 - Off — suppress the pre-compact save instruction entirely
 
-**Q15: Context tiers** — How should memory files be loaded at session start?
+**Q16: Context tiers** — How should memory files be loaded at session start?
 - Tiered (default) — Tier 1 (12 essential files) injected by SessionStart hook; Tier 2 (4 reference files) read on demand. Saves ~14k tokens vs all-in-context.
 - All in context — all active files loaded at session start (pre-v1.8.0 behaviour)
 
 *Explain: Tier 1 (config, standinginstructions, progress, last, preferences, decisions, lessons, processes, voices, memory, summaries, timeline) covers everything needed for session orientation. Tier 2 (graph, vectors, taxonomies, assets) is available on demand via the Read tool when a recall query needs it.*
 
-**Q16: Memory priority** — How should PMM interact with Claude's built-in auto-memory?
+**Q17: Memory priority** — How should PMM interact with Claude's built-in auto-memory?
 - PMM first (default) — PMM is the primary memory system; Claude auto-memory kept minimal (skill references and feedback only)
 - Deduplicate — actively merge overlapping content between PMM and Claude auto-memory
 - Coexist — both systems operate independently (pre-v1.8.0 behaviour)
 
 *Explain: Claude Code has its own auto-memory system (in .claude/projects/.../memory/). PMM-first means PMM is the source of truth — Claude auto-memory should not duplicate facts, decisions, or timeline events that PMM already tracks.*
 
-**Q17: Load strategies** — How much of each Tier 1 file should the SessionStart hook inject at session start?
+**Q18: Load strategies** — How much of each Tier 1 file should the SessionStart hook inject at session start?
 
 Read the current `## Active Files` section from `memory/config.md` and display each active Tier 1 file with its current strategy (or `full` if none set). For each file the user wants to change, accept a new strategy:
 - `full` (default) — load the entire file
@@ -166,7 +172,7 @@ If active files changed OR context tier mode changed:
 - Tier 2 files: graph, vectors, taxonomies, timeline, summaries, memory, assets
 - If files were deactivated, do NOT delete them — just remove them from the file list
 - If files were activated that don't exist yet, create them from templates in `${CLAUDE_PLUGIN_ROOT}/references/templates.md`
-- **For each newly activated file**, dispatch Phase 5 (Hydrate) using the prompt from `${CLAUDE_PLUGIN_ROOT}/references/README.md`. This ensures activated files start with synthesized content from existing memory, not empty templates. Commit hydrated files separately: `git add memory/<file> && git commit -m "memory: hydrate <file> from existing context"`
+- **For each newly activated file**, dispatch Phase 5 (Hydrate) using the prompt from `${CLAUDE_PLUGIN_ROOT}/references/core.md`. This ensures activated files start with synthesized content from existing memory, not empty templates. Commit hydrated files separately: `git add memory/<file> && git commit -m "memory: hydrate <file> from existing context"`
 
 ### Step 4 — Commit
 

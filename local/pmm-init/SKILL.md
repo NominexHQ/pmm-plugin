@@ -37,7 +37,7 @@ Options:
 - `every-N-messages` — specify a number, e.g. every 5 messages
 - `on-request` — only when you explicitly ask
 
-*Note: For interval-based saves, `/loop 5m pmm-save` runs a save on a timer.*
+*Note: For frequent saves, choose `every-N-messages` — hooks handle the trigger automatically.*
 
 **Q2: Commit behaviour** — When should changes be committed to git?
 
@@ -224,7 +224,7 @@ Dispatch a `general-purpose` agent using the `Readonly Agent Model` from config 
 
 > Scaffold the memory/ directory for Poor Man's Memory. This is a WRITE task — create files. Do NOT run git commands.
 >
-> 1. Read `references/README.md` for the file inventory and rules.
+> 1. Read `references/core.md` for the file inventory and rules.
 > 2. Read `references/templates.md` for the initial content of each file.
 > 3. Read `memory/config.md` to determine which files are active.
 > 4. Create the `memory/` directory if it doesn't exist.
@@ -296,7 +296,7 @@ Tell the user:
 ## Rules
 
 - Never overwrite an existing `memory/` installation. Check first (Step 1).
-- File structure rules and file-by-file operating rules are in `references/README.md` — do not duplicate them here.
+- File structure rules and file-by-file operating rules are in `references/core.md` — do not duplicate them here.
 - Templates for each memory file are in `references/templates.md`.
 - Agents edit files only. Main context handles all git commands.
 - `memory/secrets.md` is always created, always gitignored, never committed.

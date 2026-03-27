@@ -17,7 +17,7 @@ Run `pmm:settings` at any time to change these.
 <!-- How often memory is updated -->
 - Mode: every-milestone
 <!-- Options: every-milestone | every-N-messages (specify N) | on-request-only -->
-<!-- Note: For fine-grained control, use /loop to run a save prompt on a recurring interval -->
+<!-- Note: For frequent saves, choose every-N-messages — hooks handle the trigger automatically -->
 
 ## Commit Behaviour
 
@@ -31,6 +31,16 @@ Run `pmm:settings` at any time to change these.
 - Timeline max: 50
 - Summaries max: 10
 <!-- Presets: light (30/5) | moderate (50/10) | heavy (100/20) | unlimited -->
+
+## Decay (Advanced)
+
+<!-- Relevance-based pruning for append-only files. Baked into maintain cycle. -->
+<!-- Uncomment to enable. Configure per-file overrides in Active Files table. -->
+<!-- - Enabled: true -->
+<!-- - Default decay rate: 0.90 -->
+<!-- - Default reinforcement rate: 1.05 -->
+<!-- - Relevance ceiling: 2.0 -->
+<!-- - Prune threshold: 0.30 -->
 
 ## Verbosity
 
@@ -389,27 +399,7 @@ Ratified by: [user / consensus / default]
 Workflows and processes developed or established during this project.
 Updated when new processes are created or existing ones change.
 
-## Operating Discipline
-
-Mandatory behaviors. These apply every session regardless of context.
-
-### Before claiming ignorance ("I don't know", "I don't have that")
-- Search Tier 1 memory files (memory.md, decisions.md, lessons.md, standinginstructions.md)
-- Search Tier 2 files (btw.md, assets.md, graph.md)
-- If not found, check git history (git log -S "term" or pmm:recall)
-- Only say "I don't have it" after exhausting these sources
-
-### Before changing file structure or conventions
-- Check decisions.md for prior decisions about naming/structure
-- Check memory.md for recorded conventions
-- If no prior decision exists, state the choice and get confirmation before acting
-
-### Before /compact
-- Run pmm:save first to capture structured memory before compression
-
-### Memory authority
-- PMM files are the source of truth over native auto-memory
-- When there's a conflict, PMM wins
+<!-- Format: ## Process Name, then steps or description -->
 ```
 
 ---

@@ -53,7 +53,7 @@ Extract from `$ARGUMENTS`:
 
 **Read `memory/config.md` for `Session Start` mode.**
 
-**If `Mode: lazy`** — memory files are already in context (injected by the SessionStart hook). Execute Steps 3–6 directly in the main context window without dispatching any agent. Tier 1 files are in-context. For Tier 2 files (graph.md, vectors.md, taxonomies.md, assets.md), use the Read tool to load the relevant file before searching — do not load all four, only what the routing table requires.
+**If `Mode: lazy`** — memory files are already in context (injected by the SessionStart hook). Execute Steps 3–8 directly in the main context window without dispatching any agent. Tier 1 files are in-context. For Tier 2 files (graph.md, vectors.md, taxonomies.md, assets.md), use the Read tool to load the relevant file before searching — do not load all four, only what the routing table requires.
 
 **If `Mode: eager`** — fall through to Agent Dispatch at the end of this document.
 
@@ -96,9 +96,19 @@ Expand the result set using similarity, graph, and taxonomy data. Run regardless
 
 Deduplicate — results already found in Step 3 should not be listed again.
 
-### Step 5 — Beyond-Window Gate
+### Step 5 — Full File Escalation (T3)
 
-**Only if Steps 3 and 4 together returned no results.**
+If Steps 3 and 4 returned no results:
+1. Read `memory/config.md` for the Active Files list
+2. For each active file loaded with tail:N, header, or skip at session start:
+   re-read the file in full using the Read tool
+3. Search the full content for the query keyword
+4. If matches found, collect them and proceed to Step 7 (format output)
+5. If still no matches, proceed to Step 6 (git fallback)
+
+### Step 6 — Beyond-Window Gate
+
+**Only if Steps 3, 4, and 5 together returned no results.**
 
 Check `memory/config.md` for `## Recall Beyond Window` → `Mode`:
 
@@ -110,7 +120,7 @@ Check `memory/config.md` for `## Recall Beyond Window` → `Mode`:
   For each matching commit: git show <hash> -- memory/
   Return the relevant lines and which commit they came from.
   ```
-  Use the `Readonly Agent Model` from config (default: `haiku`). Incorporate results into Step 7 output tagged `(from git history, commit <hash>)`.
+  Use the `Readonly Agent Model` from config (default: `haiku`). Incorporate results into Step 8 output tagged `(from git history, commit <hash>)`.
 
 - **Yes, and don't ask me again** — same dispatch, then update `memory/config.md`: replace `- Mode: prompt` under `## Recall Beyond Window` with `- Mode: auto`
 
@@ -118,7 +128,7 @@ Check `memory/config.md` for `## Recall Beyond Window` → `Mode`:
 
 **If `Mode: auto`** — silently dispatch the minimal git-history agent (no file reads; same prompt as above).
 
-### Step 6 — Cross-Reference Enrichment
+### Step 7 — Cross-Reference Enrichment
 
 **Skip if deep=true** (graph.md was already traversed in Step 4b).
 
@@ -127,7 +137,7 @@ Otherwise: if results mention a named entity (person, tool, system, concept) tha
 - Append a `Related context:` note (1–2 lines) if it genuinely enriches the result
 - Do not bloat — only include if it adds something the main results don't already say
 
-### Step 7 — Format Output
+### Step 8 — Format Output
 
 **Branch A — Prose mode (default, dump=false):**
 
@@ -245,9 +255,19 @@ Dispatch a `general-purpose` agent using the `Readonly Agent Model` from `memory
 >
 > Deduplicate against Step 3 results.
 >
-> ### Step 5 — Fallback Chain
+> ### Step 5 — Full File Escalation (T3)
 >
-> If Steps 3+4 return no results:
+> If Steps 3 and 4 returned no results:
+> 1. Read `memory/config.md` for the Active Files list
+> 2. For each active file loaded with tail:N, header, or skip at session start:
+>    re-read the file in full using the Read tool
+> 3. Search the full content for the query keyword
+> 4. If matches found, collect them and proceed to Step 8 (format output)
+> 5. If still no matches, proceed to Step 6 (git fallback)
+>
+> ### Step 6 — Fallback Chain
+>
+> If Steps 3+4+5 return no results:
 > 1. Check `timeline.md` and `last.md`
 > 2. Run: `git log --all --grep="<keyword>" --oneline`
 > 3. For matching commits: `git show <hash> -- memory/` — extract relevant lines
@@ -255,11 +275,11 @@ Dispatch a `general-purpose` agent using the `Readonly Agent Model` from `memory
 >
 > Never hallucinate past context.
 >
-> ### Step 6 — Cross-Reference Enrichment
+> ### Step 7 — Cross-Reference Enrichment
 >
 > Skip if deep=true. Otherwise: if results mention a named entity in `graph.md` or `assets.md`, append a brief `Related context:` note (1–2 lines max) if it adds meaningful information.
 >
-> ### Step 7 — Format Output
+> ### Step 8 — Format Output
 >
 > Prose mode (dump=false): synthesized narrative with inline citations and `Sources:` footer.
 >
@@ -278,4 +298,4 @@ Output the agent's return value verbatim.
 - Phase 4 Recall in the main session handles implicit recall mid-conversation. This skill is the explicit, filterable version.
 - Model selection follows `Readonly Agent Model` in `memory/config.md` (default: `haiku`). No reasoning required for read-only traversal.
 - Attribution tags (`[user:name]`, `[agent:name]`, `[system:process]`) identify who originated each piece of information. Always preserve and surface them.
-- For the full memory file reference, see `references/README.md`.
+- For the full memory file reference, see `references/core.md`.
