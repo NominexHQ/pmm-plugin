@@ -35,7 +35,7 @@ Options:
 - `every-N-messages` — specify a number, e.g. every 5 messages
 - `on-request` — only when you explicitly ask
 
-*Note: For interval-based saves, `/loop 5m pmm:save` runs a save on a timer.*
+*Note: For frequent saves, choose `every-N-messages` — hooks handle the trigger automatically.*
 
 **Q2: Commit behaviour** — When should changes be committed to git?
 
@@ -222,7 +222,7 @@ Dispatch a `general-purpose` agent using the `Readonly Agent Model` from config 
 
 > Scaffold the memory/ directory for Poor Man's Memory. This is a WRITE task — create files. Do NOT run git commands.
 >
-> 1. Read `references/README.md` for the file inventory and rules.
+> 1. Read `references/core.md` for the file inventory and rules.
 > 2. Read `references/templates.md` for the initial content of each file.
 > 3. Read `memory/config.md` to determine which files are active.
 > 4. Create the `memory/` directory if it doesn't exist.
@@ -294,8 +294,32 @@ Tell the user:
 ## Rules
 
 - Never overwrite an existing `memory/` installation. Check first (Step 1).
-- File structure rules and file-by-file operating rules are in `references/README.md` — do not duplicate them here.
+- File structure rules and file-by-file operating rules are in `references/core.md` — do not duplicate them here.
 - Templates for each memory file are in `references/templates.md`.
 - Agents edit files only. Main context handles all git commands.
 - `memory/secrets.md` is always created, always gitignored, never committed.
 - The SessionStart hook injects Tier 1 files into context at session start. No CLAUDE.md changes needed.
+
+---
+
+## Phase 4 — Implicit Recall (mid-conversation)
+
+Implicit recall handles mid-conversation memory lookups without explicit `pmm:query` invocation. It follows a tiered escalation:
+
+### T1 — In-Context (0ms overhead)
+Search files already loaded in the context window via the SessionStart hook. Whatever load strategy delivered at session start — full, tail:N, or header — search that content first.
+
+### T2 — Extended Context (<500ms)
+If T1 misses, read Tier 2 files on demand (graph.md, vectors.md, taxonomies.md, assets.md). Only read files relevant to the query — not all four.
+
+### T3 — Full File Reads (<2s)
+If still no results, re-read all active files in full (overriding tail:N / header load strategies from session start) and search again. This catches entries that exist in memory files but were outside the loaded window at session start.
+
+### T4 — Git History (<10s)
+If T1+T2+T3 all miss, fall back to git history search (`git log --grep` + `git show`).
+
+**Implicit recall never prompts for T4 git access.** It follows the `Recall Beyond Window` config silently:
+- If `Mode: auto` — search git history silently
+- If `Mode: prompt` — implicit recall stops at T3. The user must run `pmm:query` explicitly to trigger the prompt gate for git history access.
+
+Each tier stops on hit. No unnecessary escalation.

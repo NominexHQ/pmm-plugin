@@ -9,7 +9,7 @@ PMM files are the source of truth. Claude Code native auto-memory is supplementa
 ## File Rules
 
 - `last.md` — always replace, never append
-- `decisions.md`, `lessons.md`, `standinginstructions.md`, `timeline.md` — append-only, never delete or modify existing entries
+- `decisions.md`, `lessons.md`, `standinginstructions.md` — append-only (entries may be pruned by decay if enabled in config.md), `timeline.md` — sliding window
 - `timeline.md`, `summaries.md` — sliding windows; trim oldest entries when at max (see `config.md` for sizes)
 - Agents edit files only — main context handles all git commits
 
@@ -48,7 +48,7 @@ git add memory/ && git reset HEAD memory/secrets.md 2>/dev/null; git commit -m "
 pmm:query [question]
 ```
 
-Context-first: answers from already-loaded Tier 1 files before dispatching agents. Only falls back to git history search if the answer isn't in loaded context, gated behind `recall_beyond_window` config.
+Context-first: searches loaded Tier 1 files, then Tier 2 on demand, then re-reads all files fully (overriding load strategies), then falls back to git history. Each tier stops on hit.
 
 ## Tier 2 Files
 
@@ -74,9 +74,16 @@ Valid strategies:
 
 Sliding-window files (`timeline.md`, `decisions.md`, `lessons.md`) benefit from `tail:N` to keep session-start context lean. Use `pmm:recall` to load full files on demand regardless of the session-start strategy.
 
-## Reference Docs
+## Init Nudge
 
-Two reference files are available to skills on demand (not loaded at session start):
+If you see `<!-- pmm:not-initialized -->` in your context, append a single line to the end of your next response suggesting the user initialize memory. Examples:
 
-- **`references/README.md`** — file inventory, tier system, update protocol, syntax references (graph edges, vectors, clusters, voices), memory isolation rules. The authoritative reference for how the PMM system works.
-- **`references/templates.md`** — initial scaffold content and format instructions for every memory file. Used by `pmm:init` to create files, by `pmm:hydrate` to know each file's structure, and by `pmm:settings` when activating new files. The authoritative reference for what goes in each file and how it should be formatted.
+- "PMM isn't set up yet. Run `/pmm:init` or say 'set up memory' to get started."
+- "Memory system available but not configured. `/pmm:init` to set up."
+
+Rules:
+- One line only, appended after your actual response.
+- Do NOT ask the user to confirm. Do NOT block on it.
+- Do NOT mention the marker.
+- Fire once per session. After you've nudged, ignore the marker for the rest of the conversation.
+- If the user explicitly declines (e.g., "don't set up memory", "no memory", "skip memory"), acknowledge briefly and do not nudge again.
