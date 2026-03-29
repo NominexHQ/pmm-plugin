@@ -34,13 +34,12 @@ Run `pmm:settings` at any time to change these.
 
 ## Decay (Advanced)
 
-<!-- Relevance-based pruning for append-only files. Baked into maintain cycle. -->
-<!-- Uncomment to enable. Configure per-file overrides in Active Files table. -->
+<!-- Relevance scoring for Tier 2 files. No pruning — decay is advisory. -->
+<!-- Uncomment to enable. -->
 <!-- - Enabled: true -->
 <!-- - Default decay rate: 0.90 -->
 <!-- - Default reinforcement rate: 1.05 -->
 <!-- - Relevance ceiling: 2.0 -->
-<!-- - Prune threshold: 0.30 -->
 
 ## Verbosity
 

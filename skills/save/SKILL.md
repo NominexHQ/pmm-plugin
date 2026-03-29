@@ -21,7 +21,7 @@ Read `memory/config.md`. Extract:
 - `Verbosity` — `silent`, `summary`, or `verbose`
 - `Active Files` — which files are currently active
 - `Repository Visibility` — `public` or `private` (controls PII handling)
-- `Decay (Advanced)` — whether decay pruning is enabled (default: disabled)
+- `Decay (Advanced)` — whether decay scoring is enabled for Tier 2 files (default: disabled)
 
 File rules are in `references/core.md`. Don't re-read it on every save — the rules are loaded in context via the plugin's SessionStart hook.
 
@@ -120,35 +120,32 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > - `decisions.md` — append-only, newest at top
 > - `lessons.md` — append-only
 >
-> **Decay pruning (if enabled in config.md `## Decay (Advanced)` section):**
+> **Decay scoring (if `## Decay (Advanced)` is uncommented in config.md):**
 >
-> ## Decay Pruning
+> ## Decay Scoring (Tier 2 files only)
 >
-> Decay is enabled for append-only memory files. During each maintain cycle:
+> Decay scoring is enabled for on-demand memory files (graph.md, vectors.md,
+> taxonomies.md, assets.md). During each maintain cycle:
 >
 > 1. Read each entry's decay tag: `<!-- decay:{score} last:{session} -->`
-> 2. Entries WITHOUT a decay tag: add `<!-- decay:1.00 last:{current_session} -->` to the entry's first line.
+> 2. Entries WITHOUT a tag: add `<!-- decay:1.00 last:{current_session} -->`
 > 3. For each entry WITH a tag:
->    a. Check if the entry was referenced this session (keyword match in "What changed", explicit citation in new entries, entity in new graph edges, or user query via pmm:query/recall).
->    b. If referenced and last session differs from current session: apply reinforcement (score *= {reinforce_rate}), cap at {ceiling}, update last to current session.
->    c. If referenced and last session is current session: reset score to 1.00.
->    d. If NOT referenced: apply decay (score *= {decay_rate}).
-> 4. If score < {prune_threshold}: remove the entry entirely. Git preserves history.
-> 5. Update the decay tag with the new score and session.
+>    a. Check if referenced this session (keyword in "What changed", citation
+>       in new entries, entity in Tier 1 updates, user query).
+>    b. If referenced, last differs from current: reinforce (score *= {rate}),
+>       cap at 2.0, update last.
+>    c. If referenced, last is current: reset to 1.00.
+>    d. If NOT referenced: decay (score *= {rate}).
+> 4. DO NOT delete any entries regardless of score. Decay is a signal, not a
+>    deletion trigger.
+> 5. Update the tag with new score and session.
 >
-> Use per-file rates from config. Fall back to these defaults if not specified:
+> Per-file rates from config. Defaults: graph 0.85, vectors 0.85, taxonomies
+> 0.90, assets 0.92. Reinforcement: 1.05 all files. Ceiling: 2.0.
 >
-> | File | Decay Rate | Reinforce Rate | Prune Threshold |
-> |------|-----------|----------------|-----------------|
-> | decisions.md | 0.95 | 1.05 | 0.20 |
-> | standinginstructions.md | 0.98 | 1.10 | 0.15 |
-> | lessons.md | 0.90 | 1.05 | 0.25 |
-> | graph.md | 0.85 | 1.05 | 0.30 |
-> | vectors.md | 0.85 | 1.05 | 0.30 |
-> Do not apply decay to timeline.md or summaries.md (they use sliding windows).
-> Tag format is strict: `<!-- decay:X.XX last:SNN -->` (two decimal places, no extra spaces).
+> Tag format: `<!-- decay:X.XX last:SNN -->` (two decimals, no extra spaces).
 >
-> *Skip this entire block if decay is not enabled in config.md.*
+> *Skip this entire block if `## Decay (Advanced)` is commented out in config.md.*
 >
 > - `graph.md` — append-only edges, use typed relationships per `references/core.md` graph syntax
 > - `vectors.md` — similarities/clusters are living (update in place), embedding registry is append-only
