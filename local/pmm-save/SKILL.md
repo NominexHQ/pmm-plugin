@@ -102,7 +102,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > `<active-file-list>`
 >
 > **First:** Read `memory/config.md` for active configuration. Respect:
-> - **Window size** — read `## Sliding Window` in `config.md` for max entry counts. Enforce these limits on `timeline.md` and `summaries.md` every maintain cycle — trim oldest entries that exceed the configured max. Do not use hardcoded numbers.
+> - **Window size** — read `## Sliding Window` in `config.md` for max entry counts. Do NOT truncate timeline.md or summaries.md during maintenance. Sliding window truncation is disabled pending a safe pre-truncation commit flow. Files may exceed configured max — this is expected.
 > - **Active files** — only update files that are active. Skip deactivated files silently.
 > - **Protected files** — never read, write, or reference `secrets.md`. If a secret value appears in conversation context, do NOT write it to any memory file.
 > - **PII handling** — check `config.md` for `Visibility`:
@@ -154,8 +154,9 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 >
 > - `graph.md` — append-only edges, use typed relationships per `references/core.md` graph syntax
 > - `vectors.md` — similarities/clusters are living (update in place), embedding registry is append-only
-> - `timeline.md` — sliding window, trim to configured max (oldest entries first). Full history is in git. When entries are about to be trimmed, summarise the batch and append to `summaries.md` first.
-> - `summaries.md` — sliding window, trim to configured max. Full history is in git.
+> - `timeline.md` — append new entries. Do NOT trim or truncate (truncation disabled).
+> - `summaries.md` — append new summaries. Do NOT trim or truncate (truncation disabled).
+> <!-- DISABLED: sliding window truncation pending safe pre-truncation commit flow. Re-enable when maintain cycle can commit before trimming. -->
 > - `last.md` — ALWAYS replace entirely with the last 3–5 significant actions. Never append.
 > - All other active files — living documents, update in place
 > - Never bleed content between files — each file has one job

@@ -301,7 +301,7 @@ git add memory/ && git reset HEAD memory/secrets.md 2>/dev/null; git commit -m "
 
 - Never edit this file unless explicitly asked
 - Never delete entries from decisions.md or standinginstructions.md
-- timeline.md and summaries.md are sliding windows — see config.md for max entries. Trim oldest, full history is in git
+- timeline.md and summaries.md are sliding windows — see config.md for max entries. Do NOT auto-truncate during maintenance (truncation disabled pending safe commit flow). Files may exceed max — this is expected. Full history is in git
 - Never hallucinate past context — if it's not in the files, say so
 - last.md is always replaced, never appended
 - graph.md edges are append-only — use typed relationships only
@@ -499,7 +499,7 @@ What to do instead:
 # Timeline
 
 Compressed chronological record of key events and milestones.
-Sliding window — trim to the configured max in config.md. Older entries live in git history.
+Sliding window — max entries configured in config.md. Auto-truncation disabled. Older entries live in git history.
 
 ## Format
 
@@ -508,7 +508,7 @@ Sliding window — trim to the configured max in config.md. Older entries live i
 
 ---
 
-<!-- Timeline entries go here, newest at bottom. Trim oldest when exceeding the configured max in config.md. -->
+<!-- Timeline entries go here, newest at bottom. Auto-truncation disabled — files may exceed configured max. -->
 ```
 
 ---
@@ -528,7 +528,7 @@ Sliding window — trim to the configured max in config.md. Older summaries live
 
 ---
 
-<!-- Summaries go here, newest at top. Trim oldest when exceeding the configured max in config.md. -->
+<!-- Summaries go here, newest at top. Auto-truncation disabled — files may exceed configured max. -->
 ```
 
 ---
