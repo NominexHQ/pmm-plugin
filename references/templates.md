@@ -27,7 +27,7 @@ Run `pmm:settings` at any time to change these.
 
 ## Sliding Window Size
 
-<!-- Max entries in windowed files (timeline, summaries) before trimming -->
+<!-- Max entries loaded at session start for windowed files (timeline, summaries). Files are never truncated on disk. -->
 - Timeline max: 50
 - Summaries max: 10
 <!-- Presets: light (30/5) | moderate (50/10) | heavy (100/20) | unlimited -->
@@ -119,7 +119,7 @@ Run `pmm:settings` at any time to change these.
 
 ## Recall Beyond Window
 
-<!-- Whether to prompt before searching git history for trimmed/old entries -->
+<!-- Whether to prompt before searching git history for older entries not in the session-start window -->
 - Mode: prompt
 <!-- Options: prompt (default) | auto -->
 <!-- prompt: ask before dispatching an agent to search git history -->
@@ -518,7 +518,7 @@ Sliding window — max entries configured in config.md. Auto-truncation disabled
 # Summaries
 
 Periodic rollups of past work — session summaries, milestone summaries, and compressed timeline batches.
-Sliding window — trim to the configured max in config.md. Older summaries live in git history.
+Sliding window — session start loads the last N entries per config.md. Full file always on disk. Git provides audit trail.
 
 ## Format
 

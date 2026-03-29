@@ -96,7 +96,7 @@ Output the agent's returned string verbatim — it contains the fully formatted 
 > - **Template-only active files:** Any active file (per config.md) that is still template-only
 > - **Stale files:** Any file not modified in >7 days (only warn if project has commits in the last 7 days)
 > - **Stale last.md:** `last.md` not updated in the current session (last modified >2 hours ago)
-> - **Large files:** Any file >200 lines (suggest trimming)
+> - **Large files:** Any file >200 lines (note size; no auto-truncation — files grow without limit by design)
 >
 > ### Step 8 — Format output
 >

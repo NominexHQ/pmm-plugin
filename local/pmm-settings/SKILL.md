@@ -63,17 +63,19 @@ Use `AskUserQuestion` to present the same questions from Phase 1 of the main ski
 - Off (default) — commits stay local until you push manually
 - On — git push runs after every memory commit (failures reported, not swallowed)
 
-**Q4: Sliding window size** — How many entries to keep before trimming?
+**Q4: Sliding window size** — How many entries to load at session start for timeline.md and summaries.md?
 - Light (30 timeline / 5 summaries)
 - Moderate (50 / 10, default)
 - Heavy (100 / 20)
-- Unlimited (no trimming)
+- Unlimited (load full file at session start)
 
-**Q5: Decay pruning (Advanced)** — Enable relevance-based pruning for append-only files?
-- Disabled (default) — append-only files grow without limit
-- Enabled — entries decay over time if unreferenced; pruned below threshold
+*Note: Files are never truncated on disk regardless of this setting. The window controls injection at session start only.*
 
-*Note: When enabled, the maintain agent tracks relevance via inline HTML comment tags. Conservative defaults: decay 0.90, reinforce 1.05, prune at 0.30. Per-file overrides available in config.md.*
+**Q5: Decay scoring (Advanced)** — Enable relevance scoring for Tier 2 files?
+- Disabled (default) — Tier 2 files (graph, vectors, taxonomies) grow without scoring
+- Enabled — entries get relevance scores; low-scoring entries are flagged as advisory signals (not deleted)
+
+*Note: When enabled, the maintain agent tracks relevance via inline HTML comment tags. Conservative defaults: decay 0.90, reinforce 1.05, advisory threshold 0.30. No entries are auto-deleted — scores are signals only. Per-file overrides available in config.md.*
 
 **Q6: Verbosity** — How should memory updates be communicated?
 - Silent — agent status indicator only
@@ -122,7 +124,7 @@ Use `AskUserQuestion` to present the same questions from Phase 1 of the main ski
 - Prompt (default) — ask permission before dispatching an agent to search git history (one agent dispatch per beyond-window query)
 - Auto — silently search git history when needed, without prompting (costs 1 agent dispatch per miss)
 
-*In lazy mode, all active memory files are already in context — git history is only needed for entries that have been trimmed from sliding-window files (timeline.md, summaries.md). Most queries will be answered from context without any agent dispatch.*
+*In lazy mode, all active memory files are already in context. Git history is the audit trail — accessible via pmm-recall for entries outside the session-start window. Most queries will be answered from context without any agent dispatch.*
 
 **Q15: Pre-compact hook** — Should PMM save before `/compact`?
 - On (default) — session-instructions.md soft instruction directs Claude to save before compact

@@ -149,9 +149,8 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 >
 > - `graph.md` — append-only edges, use typed relationships per `references/core.md` graph syntax
 > - `vectors.md` — similarities/clusters are living (update in place), embedding registry is append-only
-> - `timeline.md` — append new entries. Do NOT trim or truncate (truncation disabled).
-> - `summaries.md` — append new summaries. Do NOT trim or truncate (truncation disabled).
-> <!-- DISABLED: sliding window truncation pending safe pre-truncation commit flow. Re-enable when maintain cycle can commit before trimming. -->
+> - `timeline.md` — append new entries. Never truncate. Sliding window config controls session-start load only.
+> - `summaries.md` — append new summaries. Never truncate. Sliding window config controls session-start load only.
 > - `last.md` — ALWAYS replace entirely with the last 3–5 significant actions. Never append.
 > - All other active files — living documents, update in place
 > - Never bleed content between files — each file has one job
@@ -173,7 +172,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > | `voices.md` | New tone profile defined; internal dialogue pattern established or refined |
 > | `lessons.md` | Mistake made or lesson explicitly noted |
 > | `timeline.md` | Major milestone or event worth preserving |
-> | `summaries.md` | Session end, major milestone, or timeline entries about to be trimmed |
+> | `summaries.md` | Session end, major milestone, or when creating a batch summary of recent timeline entries |
 > | `progress.md` | State changes — milestone reached, blocker hit, next action shifts |
 > | `last.md` | Always — replace with the last 3–5 significant actions |
 > | `graph.md` | New relationship discovered; decision affects another concept |

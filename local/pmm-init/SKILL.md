@@ -48,15 +48,15 @@ Options:
 
 *Git commits are your audit trail. Auto-commit means you never lose work.*
 
-**Q3: Sliding window size** — Entries to keep in timeline.md and summaries.md before trimming:
+**Q3: Sliding window size** — How many entries to load at session start for timeline.md and summaries.md:
 
 Options:
 - `light` — 30 timeline / 5 summaries
 - `moderate` (default) — 50 timeline / 10 summaries
 - `heavy` — 100 timeline / 20 summaries
-- `unlimited` — no trimming
+- `unlimited` — load full file at session start
 
-*Trimmed entries live in git history. Full audit trail is always preserved.*
+*Files are never truncated on disk. The window controls session-start injection only. Git is the full audit trail.*
 
 **Q4: Verbosity** — How should memory updates be communicated?
 
