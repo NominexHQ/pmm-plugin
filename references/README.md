@@ -108,7 +108,7 @@ Model selection:
 Each memory file has a standard header template. Key patterns:
 - Append-only files: header explains format, entries go newest-at-top (decisions, lessons,
   standinginstructions) or newest-at-bottom (timeline)
-- Sliding windows: header specifies max entries, oldest trimmed first
+- Sliding windows: header specifies max entries loaded at session start; full file always on disk, no truncation
 - Living documents: header describes scope, updated in place
 - `last.md`: always replaced entirely, never appended
 

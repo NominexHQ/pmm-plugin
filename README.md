@@ -542,10 +542,10 @@ Injected into context by the SessionStart hook at every session start. These are
 | `lessons.md` | Mistakes made and lessons learned. What happened, and what to do instead next time | Append-only | A mistake is made, a lesson is explicitly noted, or a pattern is recognized worth preserving |
 | `preferences.md` | User-specific style, quirks, communication patterns, and working habits | Living document — update in place as patterns emerge | User preference observed or explicitly stated; communication pattern noticed over multiple sessions |
 | `memory.md` | Long-term durable facts about the project: architecture, team structure, key context, technical choices | Living document — facts updated as they change | New durable fact established; existing fact changes (e.g., team member joins, architecture shifts) |
-| `summaries.md` | Periodic session rollups — compressed records of past work for quick orientation | Sliding window (max from config, default 10) — oldest entries trimmed, preserved in git history | Session end, major milestone, or when timeline entries are about to be trimmed and need a summary |
+| `summaries.md` | Periodic session rollups — compressed records of past work for quick orientation | Sliding window (max from config, default 10) — session start loads last N; full file on disk. Git is the audit trail. | Session end, major milestone, or when creating a batch summary of recent timeline entries |
 | `voices.md` | Tone profiles for different communication contexts, and internal reasoning lenses for decision-making | Living document | New tone profile defined, existing voice refined, or new reasoning lens established |
 | `processes.md` | Workflows and repeatable procedures that have been established during the project | Living document | New process established or existing process updated based on experience |
-| `timeline.md` | Compressed chronological record of key events and milestones | Sliding window (max from config, default 50) — oldest entries trimmed, preserved in git history | Major milestone or event worth preserving; anything that changes the project's trajectory |
+| `timeline.md` | Compressed chronological record of key events and milestones | Sliding window (max from config, default 50) — session start loads last N; full file on disk. Git is the audit trail. | Major milestone or event worth preserving; anything that changes the project's trajectory |
 
 ### Tier 2 — on demand
 

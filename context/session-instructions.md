@@ -9,8 +9,8 @@ PMM files are the source of truth. Claude Code native auto-memory is supplementa
 ## File Rules
 
 - `last.md` — always replace, never append
-- `decisions.md`, `lessons.md`, `standinginstructions.md` — append-only (entries may be pruned by decay if enabled in config.md), `timeline.md` — sliding window
-- `timeline.md`, `summaries.md` — sliding windows; trim oldest entries when at max (see `config.md` for sizes)
+- `decisions.md`, `lessons.md`, `standinginstructions.md` — append-only (decay tags are advisory relevance signals when enabled; no entries are deleted)
+- `timeline.md`, `summaries.md` — sliding windows control what is injected at session start (see `config.md` for sizes); full files always on disk, no auto-truncation
 - Agents edit files only — main context handles all git commits
 
 ## When to Save
