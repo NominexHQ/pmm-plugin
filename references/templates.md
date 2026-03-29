@@ -499,7 +499,7 @@ What to do instead:
 # Timeline
 
 Compressed chronological record of key events and milestones.
-Sliding window — keep only the 20 most recent entries. Older entries live in git history.
+Sliding window — trim to the configured max in config.md. Older entries live in git history.
 
 ## Format
 
@@ -508,7 +508,7 @@ Sliding window — keep only the 20 most recent entries. Older entries live in g
 
 ---
 
-<!-- Timeline entries go here, newest at bottom. Trim oldest when exceeding 20 entries. -->
+<!-- Timeline entries go here, newest at bottom. Trim oldest when exceeding the configured max in config.md. -->
 ```
 
 ---
@@ -519,7 +519,7 @@ Sliding window — keep only the 20 most recent entries. Older entries live in g
 # Summaries
 
 Periodic rollups of past work — session summaries, milestone summaries, and compressed timeline batches.
-Sliding window — keep only the 10 most recent summaries. Older summaries live in git history.
+Sliding window — trim to the configured max in config.md. Older summaries live in git history.
 
 ## Format
 
@@ -528,7 +528,7 @@ Sliding window — keep only the 10 most recent summaries. Older summaries live 
 
 ---
 
-<!-- Summaries go here, newest at top. Trim oldest when exceeding 10 entries. -->
+<!-- Summaries go here, newest at top. Trim oldest when exceeding the configured max in config.md. -->
 ```
 
 ---
