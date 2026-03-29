@@ -301,3 +301,27 @@ Tell the user:
 - Agents edit files only. Main context handles all git commands.
 - `memory/secrets.md` is always created, always gitignored, never committed.
 - The SessionStart hook injects Tier 1 files into context at session start. No CLAUDE.md changes needed.
+
+---
+
+## Phase 4 — Implicit Recall (mid-conversation)
+
+Implicit recall handles mid-conversation memory lookups without explicit `pmm-query` invocation. It follows a tiered escalation:
+
+### T1 — In-Context (0ms overhead)
+Search files already loaded in the context window via the SessionStart hook. Whatever load strategy delivered at session start — full, tail:N, or header — search that content first.
+
+### T2 — Extended Context (<500ms)
+If T1 misses, read Tier 2 files on demand (graph.md, vectors.md, taxonomies.md, assets.md). Only read files relevant to the query — not all four.
+
+### T3 — Full File Reads (<2s)
+If still no results, re-read all active files in full (overriding tail:N / header load strategies from session start) and search again. This catches entries that exist in memory files but were outside the loaded window at session start.
+
+### T4 — Git History (<10s)
+If T1+T2+T3 all miss, fall back to git history search (`git log --grep` + `git show`).
+
+**Implicit recall never prompts for T4 git access.** It follows the `Recall Beyond Window` config silently:
+- If `Mode: auto` — search git history silently
+- If `Mode: prompt` — implicit recall stops at T3. The user must run `pmm-query` explicitly to trigger the prompt gate for git history access.
+
+Each tier stops on hit. No unnecessary escalation.
