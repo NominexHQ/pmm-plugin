@@ -100,7 +100,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > `<active-file-list>`
 >
 > **First:** Read `memory/config.md` for active configuration. Respect:
-> - **Window size** — use the configured max entries for `timeline.md` and `summaries.md`
+> - **Window size** — read `## Sliding Window` in `config.md` for max entry counts. Enforce these limits on `timeline.md` and `summaries.md` every maintain cycle — trim oldest entries that exceed the configured max. Do not use hardcoded numbers.
 > - **Active files** — only update files that are active. Skip deactivated files silently.
 > - **Protected files** — never read, write, or reference `secrets.md`. If a secret value appears in conversation context, do NOT write it to any memory file.
 > - **PII handling** — check `config.md` for `Visibility`:
