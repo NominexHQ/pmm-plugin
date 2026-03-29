@@ -23,8 +23,9 @@ Read `memory/config.md`. Extract:
 - `Verbosity` — `silent`, `summary`, or `verbose`
 - `Active Files` — which files are currently active
 - `Repository Visibility` — `public` or `private` (controls PII handling)
+- `Decay (Advanced)` — whether decay pruning is enabled (default: disabled)
 
-File rules are in `references/README.md`. Don't re-read it on every save — the rules are loaded in context via the plugin's SessionStart hook.
+File rules are in `references/core.md`. Don't re-read it on every save — the rules are loaded in context via the plugin's SessionStart hook.
 
 ---
 
@@ -108,6 +109,7 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 >   - `public`: never write personal email addresses or phone numbers. Use handles or first names only (not full legal names). Write decision conclusions and rationale — omit verbatim quotes of sensitive internal discussions.
 >   - `private`: no PII restrictions, full fidelity.
 >   - In either case: never write API keys, tokens, passwords, or credentials to any memory file.
+> - **Memory boundary** — You MUST NOT read or write files outside `<project-root>/memory/`. If a requested path resolves outside this directory, refuse the operation and report the violation. This includes other agents' memory directories.
 > - Do NOT modify `config.md` itself.
 >
 > **What changed this session:**
@@ -119,7 +121,38 @@ Dispatch one agent for all active files. Minimal overhead — correct for most i
 > - `standinginstructions.md` — append-only, never modify existing entries
 > - `decisions.md` — append-only, newest at top
 > - `lessons.md` — append-only
-> - `graph.md` — append-only edges, use typed relationships per `references/README.md` graph syntax
+>
+> **Decay pruning (if enabled in config.md `## Decay (Advanced)` section):**
+>
+> ## Decay Pruning
+>
+> Decay is enabled for append-only memory files. During each maintain cycle:
+>
+> 1. Read each entry's decay tag: `<!-- decay:{score} last:{session} -->`
+> 2. Entries WITHOUT a decay tag: add `<!-- decay:1.00 last:{current_session} -->` to the entry's first line.
+> 3. For each entry WITH a tag:
+>    a. Check if the entry was referenced this session (keyword match in "What changed", explicit citation in new entries, entity in new graph edges, or user query via pmm-query/recall).
+>    b. If referenced and last session differs from current session: apply reinforcement (score *= {reinforce_rate}), cap at {ceiling}, update last to current session.
+>    c. If referenced and last session is current session: reset score to 1.00.
+>    d. If NOT referenced: apply decay (score *= {decay_rate}).
+> 4. If score < {prune_threshold}: remove the entry entirely. Git preserves history.
+> 5. Update the decay tag with the new score and session.
+>
+> Use per-file rates from config. Fall back to these defaults if not specified:
+>
+> | File | Decay Rate | Reinforce Rate | Prune Threshold |
+> |------|-----------|----------------|-----------------|
+> | decisions.md | 0.95 | 1.05 | 0.20 |
+> | standinginstructions.md | 0.98 | 1.10 | 0.15 |
+> | lessons.md | 0.90 | 1.05 | 0.25 |
+> | graph.md | 0.85 | 1.05 | 0.30 |
+> | vectors.md | 0.85 | 1.05 | 0.30 |
+> Do not apply decay to timeline.md or summaries.md (they use sliding windows).
+> Tag format is strict: `<!-- decay:X.XX last:SNN -->` (two decimal places, no extra spaces).
+>
+> *Skip this entire block if decay is not enabled in config.md.*
+>
+> - `graph.md` — append-only edges, use typed relationships per `references/core.md` graph syntax
 > - `vectors.md` — similarities/clusters are living (update in place), embedding registry is append-only
 > - `timeline.md` — sliding window, trim to configured max (oldest entries first). Full history is in git. When entries are about to be trimmed, summarise the batch and append to `summaries.md` first.
 > - `summaries.md` — sliding window, trim to configured max. Full history is in git.
@@ -206,3 +239,37 @@ Respond based on `Verbosity` from config:
 - `silent` — no output
 - `summary` — one line: `pmm-save — memory updated` (or list key files changed if the agent returned a summary)
 - `verbose` — relay the agent's full summary of what was updated and in which files
+
+---
+
+## Background Execution
+
+pmm-save supports background execution. The calling context dispatches the entire skill as
+a background agent using `run_in_background: true`. The background agent performs all steps
+— config read, skip check, synthesize, dispatch maintain agent(s), commit — then the task
+notification delivers the result back to the caller.
+
+**Dispatch pattern:**
+
+The caller launches pmm-save as an Agent tool call with `run_in_background: true`. The agent
+receives the full skill instructions plus session context. It runs Steps 1–7 autonomously.
+When the background task completes, the caller receives the notification containing the
+commit hash (or "nothing to save" if the skip check triggered).
+
+**Sequential queue:**
+
+Background saves touching shared memory files must not race. If another save operation
+(pmm-save or vera:save) is already running in background, wait for its completion notification
+before dispatching. One save at a time — sequential, not concurrent.
+
+**Foreground confirmation:**
+
+Not required. pmm-save is routine maintenance — the commit hash arrives via task notification
+and can be logged silently. The caller respects the `Verbosity` setting from config: if
+`silent`, swallow the notification entirely; if `summary` or `verbose`, optionally surface it.
+
+**Permissions:**
+
+Background agents have full tool access (Read, Write, Edit, Bash, Agent). No capability
+restrictions — the background agent can dispatch maintain sub-agents and run git commands
+identically to foreground execution.
