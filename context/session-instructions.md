@@ -87,3 +87,37 @@ Rules:
 - Do NOT mention the marker.
 - Fire once per session. After you've nudged, ignore the marker for the rest of the conversation.
 - If the user explicitly declines (e.g., "don't set up memory", "no memory", "skip memory"), acknowledge briefly and do not nudge again.
+
+## Reading Files
+
+When reading any file, read the first and last portions first. How much to read
+from each end is your judgment — enough to understand the file's structure,
+format, and recency. If that covers the entire file, proceed normally.
+
+If lines were omitted between head and tail, collect context before deciding
+what to do next:
+
+1. How many lines were omitted
+2. The file's last modified timestamp and size from the filesystem
+3. Any dates found in the file (best-effort scan, do not load content for this)
+4. The file's absolute path, relative path from your current working directory,
+   and the current working directory itself
+
+Present this between the head and tail sections:
+
+```
+--- [GAP: {lines_omitted} lines omitted] ---
+File: {absolute_path}
+From: {relative_path} (CWD: {cwd})
+Modified: {timestamp} | Size: {size}
+Content dates: {dates_found or "none found"}
+---
+```
+
+Then choose one action and proceed:
+- Read a specific section of the file for more detail
+- Search the file for specific content
+- Continue with what you have
+
+Do not peek more than 3 files consecutively without doing work between peeks.
+If any metadata collection fails, emit what you have and continue.
