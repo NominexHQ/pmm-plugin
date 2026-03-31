@@ -676,3 +676,69 @@ Use formats from references/vector-syntax.md.
 |---|---|---|---|---|---|
 | | | | | | |
 ```
+
+---
+
+## user.md
+
+```markdown
+# User Identity
+
+Operative identity layer — how the user thinks, communicates, and decides.
+Seeded by `pmm:onboard`. No PII — name, location, and people live in secrets.md.
+
+## Cognitive Profile
+
+<!-- Working style, decision patterns, what frustrates, what lands -->
+
+## Communication
+
+### Non-negotiables
+
+| Rule | Detail |
+|------|--------|
+| | |
+
+### Tone defaults
+
+<!-- Overall energy, what good feels like, what bad feels like -->
+
+### Formatting defaults
+
+<!-- Prose vs bullets, length, header usage -->
+
+## Modes
+
+### Default Mode
+<!-- Default operating register and stance -->
+
+<!-- Add situational modes as needed:
+### [Mode Name]
+*(triggered when [context])*
+[Tone and behaviour in this mode]
+-->
+
+## Principles
+
+<!-- Operating philosophy, in the user's own language. Only include genuine principles
+that should change how the AI operates — not generic platitudes. -->
+
+## Rhythms
+
+<!-- Decision process, operating cadence, recurring rituals. Global only —
+per-role workflows go in project-level processes.md. -->
+
+## Calibration
+
+<!-- Inferred patterns — held as interpretation, not fact. Append-only.
+Each entry should be an operative instruction derived from observed behaviour.
+Format: observation → instruction. -->
+
+## Anti-patterns
+
+<!-- Things the AI must never do. Append-only. -->
+
+## Background
+
+<!-- Only what changes how the AI operates. Not a biography. -->
+```
