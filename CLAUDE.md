@@ -3,5 +3,5 @@
 ## Governed Repos
 
 If you encounter a `project-manifest.md` during any directory traversal, run
-`vera:project discover` from that directory to find all manifests in the policy chain.
-Read and follow every manifest found, leaf to root.
+`vera:project discover` from that directory. The governance brief contains all
+applicable rules from the full manifest chain — follow them.
