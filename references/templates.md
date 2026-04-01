@@ -1,6 +1,6 @@
 # Memory File Templates
 
-Initial content for each file in the poor-man-memory system.
+Initial content for each file in the Poor Man's Memory system.
 
 ---
 
