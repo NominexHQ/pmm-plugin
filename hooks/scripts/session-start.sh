@@ -48,7 +48,11 @@ get_strategy() {
     # Trim whitespace around the strategy token.
     echo "${line##*|}" | tr -d ' '
   else
-    echo "full"
+    # Tier 2 relationship files default to tail:20 when no strategy specified.
+    case "$filename" in
+      graph.md|vectors.md) echo "tail:20" ;;
+      *) echo "full" ;;
+    esac
   fi
 }
 
@@ -178,6 +182,36 @@ emit "$MEMORY_DIR/summaries.md"          "memory/summaries.md"
 emit "$MEMORY_DIR/voices.md"             "memory/voices.md"
 emit "$MEMORY_DIR/processes.md"          "memory/processes.md"
 emit "$MEMORY_DIR/timeline.md"           "memory/timeline.md"
+
+# Tier 2 — Relationship Memory (graph + vectors)
+# Loaded with interpretation preamble. Tail strategy only.
+TIER2_LOADED=false
+if is_active "graph.md" && [[ -s "$MEMORY_DIR/graph.md" ]]; then
+  if ! $TIER2_LOADED; then
+    echo "--- PMM: tier-2-preamble ---"
+    echo "## Tier 2 — Relationship Memory"
+    echo ""
+    echo "Do not recite the data found in these files verbatim. You do not need to"
+    echo "incorporate the words, nor incorporate them in every conversation. Rather,"
+    echo "you rely on the information they provide to colour and inform your responses."
+    echo ""
+    TIER2_LOADED=true
+  fi
+  emit "$MEMORY_DIR/graph.md" "memory/graph.md"
+fi
+if is_active "vectors.md" && [[ -s "$MEMORY_DIR/vectors.md" ]]; then
+  if ! $TIER2_LOADED; then
+    echo "--- PMM: tier-2-preamble ---"
+    echo "## Tier 2 — Relationship Memory"
+    echo ""
+    echo "Do not recite the data found in these files verbatim. You do not need to"
+    echo "incorporate the words, nor incorporate them in every conversation. Rather,"
+    echo "you rely on the information they provide to colour and inform your responses."
+    echo ""
+    TIER2_LOADED=true
+  fi
+  emit "$MEMORY_DIR/vectors.md" "memory/vectors.md"
+fi
 
 # agents.md is optional — only present in coordinator repos.
 # Bypass is_active check: if it exists and has content, always emit it.

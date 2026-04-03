@@ -52,7 +52,9 @@ Context-first: searches loaded Tier 1 files, then Tier 2 on demand, then re-read
 
 ## Tier 2 Files
 
-`graph.md`, `vectors.md`, `taxonomies.md`, `assets.md` are not loaded at session start. Load them on demand when a request involves relationships, semantic clusters, categories, or asset references. Read only what's needed.
+`graph.md` and `vectors.md` are loaded at session start (tail excerpt with interpretation preamble). They provide relationship context — use them to colour and inform your responses, not to recite verbatim.
+
+`taxonomies.md` and `assets.md` are not loaded at session start. Load them on demand when a request involves categories, naming conventions, or asset references. Read only what's needed.
 
 If `memory/secrets.md` exists, credentials are available there. Do not echo or summarise its contents.
 

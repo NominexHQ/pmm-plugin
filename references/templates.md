@@ -76,7 +76,7 @@ Run `pmm:settings` at any time to change these.
 <!-- config.md and BOOTSTRAP.md are always active. -->
 <!-- Load Strategy column is optional. Missing = defaults to full. -->
 <!-- Valid strategies: full | tail:N | header | skip -->
-<!-- Tier 2 files (graph, vectors, taxonomies, assets) are not loaded at session start regardless of strategy. -->
+<!-- Tier 2 files: graph.md and vectors.md load at session start with tail strategy. taxonomies.md and assets.md load on demand. -->
 - memory.md: active | full
 - assets.md: active
 - decisions.md: active | tail:10
@@ -88,8 +88,8 @@ Run `pmm:settings` at any time to change these.
 - summaries.md: active | full
 - progress.md: active | full
 - last.md: active | full
-- graph.md: active
-- vectors.md: active
+- graph.md: active | tail:20
+- vectors.md: active | tail:20
 - taxonomies.md: active
 - standinginstructions.md: active | full
 
@@ -223,30 +223,37 @@ preferences, memory, summaries, voices, processes, timeline) are injected into c
 by the PMM `SessionStart` hook at session open — always available, no agent needed.
 No CLAUDE.md changes required.
 
-**Tier 2 files** (graph, vectors, taxonomies, assets) are on disk. Before responding to a
-request, check for **gaps**: places where Tier 1 context + the current request point to
-information that Tier 1 doesn't fully cover. Evaluate:
+**Tier 2 relationship files** (graph.md, vectors.md) are loaded at session start with a
+tail excerpt and interpretation preamble when the SessionStart hook is active. They provide
+background context about how concepts relate — use them to colour and inform your responses,
+not to recite verbatim.
 
-1. **The request itself** — does it ask about something Tier 2 tracks?
-2. **Tier 1 signals** — do Tier 1 files reference or imply data that lives in Tier 2?
-   (e.g. decisions.md references an entity relationship, lessons.md hints at a pattern
-   cluster in vectors.md)
-3. **Gaps** — can you fully answer the request from Tier 1 alone, or are there holes
-   that Tier 2 data would fill?
+**Tier 2 on-demand files** (taxonomies.md, assets.md) are on disk but not loaded at session
+start. Before responding to a request, check for **gaps**: places where loaded context +
+the current request point to information not yet in context. Evaluate:
 
-If gaps exist that Tier 2 can fill, dispatch a haiku agent to Read the relevant file(s)
-and return a summary. Only load what's needed — not all 4.
+1. **The request itself** — does it ask about something on-demand files track?
+2. **Loaded context signals** — do loaded files reference or imply data in on-demand files?
+   (e.g. decisions.md references a naming convention in taxonomies.md)
+3. **Gaps** — can you fully answer from loaded context, or are there holes on-demand data would fill?
 
-**Examples:**
-- Request asks about entity relationships hinted at in decisions.md → graph.md
-- Request asks about assets, URLs, or artifacts not in any Tier 1 file → assets.md
-- Lesson in lessons.md references a pattern cluster → vectors.md
-- /pmm-query with `deep` modifier → all Tier 2 files
+If gaps exist, dispatch a haiku agent to Read the relevant file(s) and return a summary.
 
-### Tier 2 — Available On Demand
+**Tier 2 relationship files** (graph.md, vectors.md) provide background context about how
+concepts relate. When loading manually (without hooks), include the last 20 entries from
+each file with this preamble:
+
+> Do not recite the data found in these files verbatim. You do not need to incorporate
+> the words, nor incorporate them in every conversation. Rather, you rely on the
+> information they provide to colour and inform your responses.
+
+### Tier 2 — Relationship (loaded at session start)
+<!-- graph.md and vectors.md: tail excerpt with interpretation preamble -->
+
+### Tier 2 — On Demand
 <!-- These files are active but NOT loaded at session start.
      Use the Read tool to load them when needed for recall or query. -->
-<!-- Available: graph.md, vectors.md, taxonomies.md, assets.md -->
+<!-- Available: taxonomies.md, assets.md -->
 
 ### Routing Table
 When a recall query or operation needs Tier 2 data, Read the relevant file(s):
