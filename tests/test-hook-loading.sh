@@ -3,7 +3,7 @@
 #
 # Verifies that the hook produces correct, usable context against the real VP memory.
 # Tests five categories:
-#   1. Complete context — all Tier 1 files present, Tier 2 absent
+#   1. Complete context — all Tier 1 files present, Tier 2 relationship files present, Tier 2 on-demand absent
 #   2. Load strategies applied correctly — tail:N limits on timeline/decisions/lessons
 #   3. Post-compact idempotency — hook output byte-identical on successive runs
 #   4. Critical content — agent-critical facts present in output
@@ -164,16 +164,45 @@ else
   fail "$T" "header '--- PMM: session-instructions ---' not found"
 fi
 
-# Tier 2 files must NOT appear
+# Tier 2 relationship files (graph, vectors) SHOULD appear
+tier2_loaded_files=(graph.md vectors.md)
 
-tier2_files=(graph.md vectors.md taxonomies.md assets.md)
+for fname in "${tier2_loaded_files[@]}"; do
+  T="Tier 2 relationship file present: $fname"
+  if grep -q "PMM: memory/${fname}" <<< "$HOOK_OUTPUT"; then
+    pass "$T"
+  else
+    fail "$T" "header '--- PMM: memory/$fname ---' not found — Tier 2 relationship files should load at session start"
+  fi
+done
 
-for fname in "${tier2_files[@]}"; do
-  T="Tier 2 file absent: $fname"
+# Tier 2 preamble should appear exactly once
+T="Tier 2 preamble present"
+if grep -q "PMM: tier-2-preamble" <<< "$HOOK_OUTPUT"; then
+  pass "$T"
+else
+  fail "$T" "tier-2-preamble header not found in output"
+fi
+
+T="Tier 2 preamble appears exactly once"
+{
+  preamble_count=$(grep -c "PMM: tier-2-preamble" <<< "$HOOK_OUTPUT" || true)
+  if [[ "$preamble_count" -eq 1 ]]; then
+    pass "$T"
+  else
+    fail "$T" "preamble appeared $preamble_count times; expected exactly 1"
+  fi
+}
+
+# Tier 2 on-demand files (taxonomies, assets) must NOT appear
+tier2_ondemand_files=(taxonomies.md assets.md)
+
+for fname in "${tier2_ondemand_files[@]}"; do
+  T="Tier 2 on-demand file absent: $fname"
   if ! grep -q "PMM: memory/${fname}" <<< "$HOOK_OUTPUT"; then
     pass "$T"
   else
-    fail "$T" "$fname header found in output — Tier 2 files should not load at session start"
+    fail "$T" "$fname header found in output — on-demand Tier 2 files should not load at session start"
   fi
 done
 
@@ -434,14 +463,16 @@ T="output contains at least one timeline entry (from timeline.md tail)"
   fi
 }
 
-# Old entries must NOT appear — Session 8a is the oldest entry in timeline.md
-# and is well outside the tail:5 window
-T="output does NOT contain oldest timeline entry (Session 8a — outside tail:5 window)"
+# Old entries must NOT appear in the timeline section — Session 8a is the oldest entry
+# in timeline.md and is well outside the tail:5 window.
+# Check the timeline section only (not full output, since graph.md may reference old sessions).
+T="timeline section does NOT contain oldest timeline entry (Session 8a — outside tail:5 window)"
 {
-  if ! grep -q "Session 8a" <<< "$HOOK_OUTPUT"; then
+  timeline_section=$(extract_section "timeline.md")
+  if ! grep -q "Session 8a" <<< "$timeline_section"; then
     pass "$T"
   else
-    fail "$T" "Session 8a found in output — tail:5 truncation not working on timeline"
+    fail "$T" "Session 8a found in timeline section — tail:5 truncation not working on timeline"
   fi
 }
 
