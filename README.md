@@ -532,6 +532,10 @@ The distinction matters: hard triggers catch what soft triggers might miss, and 
 
 Injected into context by the SessionStart hook at every session start. These are the 12 core files that give Claude your project's memory without manual wiring. Each file's load strategy is configurable via `config.md` (`full`, `tail:N`, `header`, or `skip`) — not all-or-nothing loading.
 
+**Current state files** (config, standinginstructions, last, progress, preferences, memory, summaries, voices, processes) are loaded in full — they define the project's current state and scope.
+
+**Sliding window files** (decisions, lessons, timeline) are loaded via `tail:N` — only the most recent entries appear. These provide background context from recent sessions but do not define the scope of current work. The hook emits a preamble before sliding window files to make this distinction clear at load time.
+
 | File | What it stores | Update rule | Trigger |
 |------|---------------|-------------|---------|
 | `config.md` | PMM configuration: save cadence, model selection, active files, context tiers, window sizes, verbosity | Modified only by `pmm:settings` | User runs `pmm:settings` |

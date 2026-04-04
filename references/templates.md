@@ -218,10 +218,16 @@ Current installation: this project. Upstream: https://github.com/NominexHQ/poor-
 
 This project uses a structured memory system in the `memory/` folder.
 
-**Tier 1 files** (config, standinginstructions, last, progress, decisions, lessons,
-preferences, memory, summaries, voices, processes, timeline) are injected into context
-by the PMM `SessionStart` hook at session open — always available, no agent needed.
-No CLAUDE.md changes required.
+**Tier 1 — current state** (config, standinginstructions, last, progress, preferences,
+memory, summaries, voices, processes) are loaded in full at session start by the PMM
+`SessionStart` hook. Always available, no agent needed. No CLAUDE.md changes required.
+
+**Tier 1 — sliding window** (decisions, lessons, timeline) are loaded via `tail:N` at
+session start — only the most recent entries appear. These provide background context
+from recent sessions. They do **not** define the scope, agent roster, or parameters of
+current work. Names, lists, and decisions in these entries may refer to different
+workstreams. When saving or synthesising, verify scoped claims against the source
+document, not against what was loaded at session start.
 
 **Tier 2 relationship files** (graph.md, vectors.md) are loaded at session start with a
 tail excerpt and interpretation preamble when the SessionStart hook is active. They provide
