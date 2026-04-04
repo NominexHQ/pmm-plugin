@@ -165,23 +165,65 @@ emit() {
 }
 
 # Tier 1 files in load order.
+# Two passes: full-loaded files first, then sliding-window (tail:N) files with preamble.
 # config.md is always emitted in full — it's the config itself, never in its own Active Files list.
 if [[ -s "$MEMORY_DIR/config.md" ]]; then
   echo "--- PMM: memory/config.md ---"
   cat "$MEMORY_DIR/config.md"
   echo ""
 fi
-emit "$MEMORY_DIR/standinginstructions.md" "memory/standinginstructions.md"
-emit "$MEMORY_DIR/last.md"               "memory/last.md"
-emit "$MEMORY_DIR/progress.md"           "memory/progress.md"
-emit "$MEMORY_DIR/decisions.md"          "memory/decisions.md"
-emit "$MEMORY_DIR/lessons.md"            "memory/lessons.md"
-emit "$MEMORY_DIR/preferences.md"        "memory/preferences.md"
-emit "$MEMORY_DIR/memory.md"             "memory/memory.md"
-emit "$MEMORY_DIR/summaries.md"          "memory/summaries.md"
-emit "$MEMORY_DIR/voices.md"             "memory/voices.md"
-emit "$MEMORY_DIR/processes.md"          "memory/processes.md"
-emit "$MEMORY_DIR/timeline.md"           "memory/timeline.md"
+
+# --- Pass 1: Full-loaded Tier 1 files (current state) ---
+TIER1_FULL_FILES=(
+  "standinginstructions.md"
+  "last.md"
+  "progress.md"
+  "preferences.md"
+  "memory.md"
+  "summaries.md"
+  "voices.md"
+  "processes.md"
+)
+for f in "${TIER1_FULL_FILES[@]}"; do
+  emit "$MEMORY_DIR/$f" "memory/$f"
+done
+
+# --- Pass 2: Sliding-window Tier 1 files (recent history) ---
+# These files are loaded via tail:N — only the most recent entries appear.
+# Preamble emitted once before the first sliding-window file.
+TIER1_TAIL_FILES=(
+  "decisions.md"
+  "lessons.md"
+  "timeline.md"
+)
+TAIL_PREAMBLE_EMITTED=false
+for f in "${TIER1_TAIL_FILES[@]}"; do
+  if ! is_active "$f"; then
+    continue
+  fi
+  local_strategy=$(get_strategy "$f")
+  if [[ "$local_strategy" != tail:* ]] || [[ "$local_strategy" == "tail:0" ]]; then
+    # Not tail-loaded or suppressed — emit normally without preamble.
+    emit "$MEMORY_DIR/$f" "memory/$f"
+    continue
+  fi
+  if [[ ! -s "$MEMORY_DIR/$f" ]]; then
+    continue
+  fi
+  if ! $TAIL_PREAMBLE_EMITTED; then
+    echo "--- PMM: sliding-window-preamble ---"
+    echo "## Sliding Window — Recent History"
+    echo ""
+    echo "The following files are loaded via tail:N — only the most recent entries"
+    echo "are shown. They provide background context from recent sessions, not the"
+    echo "scope or parameters of current work. Names, agent lists, and decisions in"
+    echo "these entries may refer to different workstreams. When saving or acting on"
+    echo "scoped efforts, verify claims against the source document."
+    echo ""
+    TAIL_PREAMBLE_EMITTED=true
+  fi
+  emit "$MEMORY_DIR/$f" "memory/$f"
+done
 
 # Tier 2 — Relationship Memory (graph + vectors)
 # Loaded with interpretation preamble. Tail strategy only.

@@ -76,6 +76,8 @@ Valid strategies:
 
 Sliding-window files (`timeline.md`, `decisions.md`, `lessons.md`) benefit from `tail:N` to keep session-start context lean. Use `pmm:recall` to load full files on demand regardless of the session-start strategy.
 
+**Tail:N content is reference context, not scope.** Files loaded via `tail:N` show only the most recent entries. They provide background from recent sessions — they do not define the scope, agent roster, or parameters of current work. Names, lists, and decisions in tail-loaded entries may refer to different workstreams. When saving or synthesising, verify scoped claims (agent lists, protocol parameters, batch counts) against the source document, not against what was loaded at session start.
+
 ## Init Nudge
 
 If you see `<!-- pmm:not-initialized -->` in your context, append a single line to the end of your next response suggesting the user initialize memory. Examples:
